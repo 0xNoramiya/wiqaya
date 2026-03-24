@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+apikey
+*.pem
+.DS_Store
+*.local
