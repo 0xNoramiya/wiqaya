@@ -3,7 +3,7 @@
   "name": "Wiqaya — وقاية",
   "version": "1.0.0",
   "description": "Your screen time, redeemed. A Quran verse gate for mindful browsing.",
-  "permissions": ["activeTab", "tabs", "storage", "idle", "alarms"],
+  "permissions": ["activeTab", "tabs", "storage", "idle", "alarms", "identity"],
   "host_permissions": [
     "https://apis.quran.foundation/*",
     "https://apis-prelive.quran.foundation/*",

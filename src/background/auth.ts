@@ -1,4 +1,4 @@
-import { AUTH_URL, TOKEN_URL, USER_API, CLIENT_ID, CLIENT_SECRET, MUSHAF_ID } from '../shared/constants'
+import { AUTH_URL, AUTH_TOKEN_URL, USER_API, AUTH_CLIENT_ID, AUTH_CLIENT_SECRET, MUSHAF_ID } from '../shared/constants'
 import { getStorage, setStorage } from '../shared/storage'
 import type { Bookmark } from '../shared/types'
 
@@ -24,19 +24,18 @@ function generateState(): string {
 
 // --- Login Flow ---
 
-export async function startLogin(): Promise<void> {
+export async function startLogin(): Promise<boolean> {
   const verifier = generateCodeVerifier()
   const challenge = await generateCodeChallenge(verifier)
   const state = generateState()
 
-  await chrome.storage.local.set({ pkceVerifier: verifier, pkceState: state })
-
-  const callbackUrl = chrome.runtime.getURL('callback.html')
+  // Use chrome.identity redirect URL — no registration needed for this format
+  const redirectUrl = chrome.identity.getRedirectURL()
 
   const params = new URLSearchParams({
     response_type: 'code',
-    client_id: CLIENT_ID,
-    redirect_uri: callbackUrl,
+    client_id: AUTH_CLIENT_ID,
+    redirect_uri: redirectUrl,
     scope: 'openid offline_access user collection',
     code_challenge: challenge,
     code_challenge_method: 'S256',
@@ -44,34 +43,35 @@ export async function startLogin(): Promise<void> {
   })
 
   const authorizeUrl = `${AUTH_URL}?${params.toString()}`
-  await chrome.tabs.create({ url: authorizeUrl })
-}
-
-// --- Callback Handler ---
-
-export async function handleAuthCallback(code: string, state: string): Promise<boolean> {
-  const stored = await chrome.storage.local.get(['pkceVerifier', 'pkceState'])
-  const { pkceVerifier, pkceState } = stored
-
-  if (!pkceVerifier || !pkceState) return false
-  if (state !== pkceState) return false
-
-  const callbackUrl = chrome.runtime.getURL('callback.html')
 
   try {
+    const responseUrl = await chrome.identity.launchWebAuthFlow({
+      url: authorizeUrl,
+      interactive: true,
+    })
+
+    if (!responseUrl) return false
+
+    const url = new URL(responseUrl)
+    const code = url.searchParams.get('code')
+    const returnedState = url.searchParams.get('state')
+
+    if (!code || returnedState !== state) return false
+
+    // Exchange code for tokens
     const body = new URLSearchParams({
       grant_type: 'authorization_code',
       code,
-      redirect_uri: callbackUrl,
-      code_verifier: pkceVerifier,
-      client_id: CLIENT_ID,
+      redirect_uri: redirectUrl,
+      code_verifier: verifier,
+      client_id: AUTH_CLIENT_ID,
     })
 
-    const response = await fetch(TOKEN_URL, {
+    const response = await fetch(AUTH_TOKEN_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Basic ${btoa(CLIENT_ID + ':' + CLIENT_SECRET)}`,
+        Authorization: `Basic ${btoa(AUTH_CLIENT_ID + ':' + AUTH_CLIENT_SECRET)}`,
       },
       body: body.toString(),
     })
@@ -79,17 +79,15 @@ export async function handleAuthCallback(code: string, state: string): Promise<b
     if (!response.ok) return false
 
     const data = await response.json()
-    const { access_token, refresh_token, expires_in } = data
-
     await setStorage({
-      accessToken: access_token,
-      refreshToken: refresh_token,
-      tokenExpiresAt: Date.now() + expires_in * 1000,
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      tokenExpiresAt: Date.now() + data.expires_in * 1000,
     })
 
-    await chrome.storage.local.remove(['pkceVerifier', 'pkceState'])
     return true
-  } catch {
+  } catch (err) {
+    console.error('Login failed:', err)
     return false
   }
 }
@@ -120,11 +118,11 @@ export async function getValidAccessToken(): Promise<string | null> {
       refresh_token: refreshToken,
     })
 
-    const response = await fetch(TOKEN_URL, {
+    const response = await fetch(AUTH_TOKEN_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Basic ${btoa(CLIENT_ID + ':' + CLIENT_SECRET)}`,
+        Authorization: `Basic ${btoa(AUTH_CLIENT_ID + ':' + AUTH_CLIENT_SECRET)}`,
       },
       body: body.toString(),
     })
@@ -157,7 +155,7 @@ async function getAuthHeaders(): Promise<Record<string, string> | null> {
   if (!accessToken) return null
   return {
     'x-auth-token': accessToken,
-    'x-client-id': CLIENT_ID,
+    'x-client-id': AUTH_CLIENT_ID,
     'Content-Type': 'application/json',
   }
 }

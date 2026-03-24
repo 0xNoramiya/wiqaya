@@ -1,4 +1,4 @@
-import { CONTENT_API, TOKEN_URL, CLIENT_ID, CLIENT_SECRET } from '../shared/constants'
+import { CONTENT_API, CONTENT_CONTENT_TOKEN_URL, CONTENT_CONTENT_CLIENT_ID, CONTENT_CONTENT_CLIENT_SECRET } from '../shared/constants'
 import { getStorage, setStorage } from '../shared/storage'
 import type { VerseData } from '../shared/types'
 
@@ -21,11 +21,11 @@ async function getContentToken(): Promise<string> {
     return contentAccessToken
   }
 
-  const response = await fetch(TOKEN_URL, {
+  const response = await fetch(CONTENT_TOKEN_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Basic ${btoa(CLIENT_ID + ':' + CLIENT_SECRET)}`,
+      Authorization: `Basic ${btoa(CONTENT_CLIENT_ID + ':' + CONTENT_CLIENT_SECRET)}`,
     },
     body: 'grant_type=client_credentials&scope=content',
   })
@@ -62,7 +62,7 @@ async function getChapters(): Promise<Chapter[]> {
   const response = await fetch(`${CONTENT_API}/chapters`, {
     headers: {
       'x-auth-token': token,
-      'x-client-id': CLIENT_ID,
+      'x-client-id': CONTENT_CLIENT_ID,
     },
   })
 
@@ -98,7 +98,7 @@ export async function fetchRandomVerse(): Promise<VerseData> {
     {
       headers: {
         'x-auth-token': token,
-        'x-client-id': CLIENT_ID,
+        'x-client-id': CONTENT_CLIENT_ID,
       },
     }
   )
@@ -122,7 +122,7 @@ export async function fetchRandomVerse(): Promise<VerseData> {
       {
         headers: {
           'x-auth-token': token,
-          'x-client-id': CLIENT_ID,
+          'x-client-id': CONTENT_CLIENT_ID,
         },
       }
     )
@@ -153,7 +153,7 @@ export async function fetchRandomVerse(): Promise<VerseData> {
       {
         headers: {
           'x-auth-token': token,
-          'x-client-id': CLIENT_ID,
+          'x-client-id': CONTENT_CLIENT_ID,
         },
       }
     )

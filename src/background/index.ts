@@ -1,6 +1,6 @@
 import { startTracking, applyGracePeriod, dismissOverlay, getDomainFromUrl } from './tracker'
 import { fetchRandomVerse } from './api'
-import { startLogin, handleAuthCallback, isLoggedIn, addBookmark, getBookmarks, deleteBookmark, logReadingSession, logActivityDay, getStreaks, logout } from './auth'
+import { startLogin, isLoggedIn, addBookmark, getBookmarks, deleteBookmark, logReadingSession, logActivityDay, getStreaks, logout } from './auth'
 import { getStorage, setStorage } from '../shared/storage'
 
 startTracking()
@@ -31,14 +31,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === 'START_LOGIN') {
-    startLogin().then(() => sendResponse({ success: true }))
-    return true
-  }
-
-  if (message.type === 'AUTH_CALLBACK') {
-    handleAuthCallback(message.code, message.state).then(success => {
-      sendResponse({ success })
-    })
+    startLogin().then(success => sendResponse({ success }))
     return true
   }
 
