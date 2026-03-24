@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head><title>Wiqaya — Login</title></head>
+<body>
+  <p>Logging you in...</p>
+  <script>
+    const params = new URLSearchParams(window.location.search)
+    const code = params.get('code')
+    const state = params.get('state')
+    if (code && state) {
+      chrome.runtime.sendMessage({ type: 'AUTH_CALLBACK', code, state }, (response) => {
+        if (response && response.success) {
+          document.body.innerHTML = '<p>Logged in! You can close this tab.</p>'
+        } else {
+          document.body.innerHTML = '<p>Login failed. Please try again.</p>'
+        }
+        // Auto-close after 2 seconds
+        setTimeout(() => window.close(), 2000)
+      })
+    } else {
+      document.body.innerHTML = '<p>Login error: missing parameters.</p>'
+    }
+  </script>
+</body>
+</html>

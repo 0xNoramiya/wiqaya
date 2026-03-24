@@ -57,3 +57,9 @@ export type WiqayaMessage =
   | { type: 'AUTH_STATUS'; isLoggedIn: boolean }
   | { type: 'START_LOGIN' }
   | { type: 'LOGOUT' }
+  | { type: 'AUTH_CALLBACK'; code: string; state: string }
+  | { type: 'GET_BOOKMARKS' }
+  | { type: 'BOOKMARKS_DATA'; bookmarks: Bookmark[] }
+  | { type: 'DELETE_BOOKMARK'; id: string }
+  | { type: 'GET_STREAKS' }
+  | { type: 'STREAKS_DATA'; streak: { days: number; status: string } | null }
