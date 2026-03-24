@@ -1,0 +1,435 @@
+@import 'tailwindcss';
+
+/* Load beautiful Arabic font */
+@font-face {
+  font-family: 'Amiri';
+  font-style: normal;
+  font-weight: 400;
+  src: url('https://fonts.gstatic.com/s/amiri/v27/J7aRnpd8CGxBHqUrtQ.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0898-08E1, U+FB50-FDFF, U+FE70-FEFF;
+}
+
+@font-face {
+  font-family: 'Amiri';
+  font-style: normal;
+  font-weight: 700;
+  src: url('https://fonts.gstatic.com/s/amiri/v27/J7acnpd8CGxBHp2VkZY.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0898-08E1, U+FB50-FDFF, U+FE70-FEFF;
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 400;
+  src: url('https://fonts.gstatic.com/s/cormorantgaramond/v16/co3bmX5slCNuHLi8bLeY9MK7whWMhyjQEl5f.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: italic;
+  font-weight: 400;
+  src: url('https://fonts.gstatic.com/s/cormorantgaramond/v16/co3ZmX5slCNuHLi8bLeY9MK7whWMhyjYrEtFmS.woff2') format('woff2');
+}
+
+/* ==============================
+   OVERLAY STRUCTURE
+   ============================== */
+
+.wiqaya-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+}
+
+.wiqaya-overlay.wiqaya-visible {
+  opacity: 1;
+}
+
+.wiqaya-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 10, 25, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.wiqaya-content {
+  position: relative;
+  z-index: 1;
+  max-width: 620px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* ==============================
+   AYAH CARD
+   ============================== */
+
+.wiqaya-card {
+  width: 100%;
+  background: linear-gradient(145deg, #0c1445 0%, #0a2233 50%, #0a2a2a 100%);
+  border-radius: 20px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  padding: 2.5rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* Ornamental top line */
+.wiqaya-card-ornament {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.wiqaya-card-ornament-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.4), transparent);
+  max-width: 80px;
+}
+
+.wiqaya-card-ornament-symbol {
+  color: rgba(212, 175, 55, 0.7);
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+  font-family: 'Amiri', serif;
+  line-height: 1;
+}
+
+/* Arabic text — the hero */
+.wiqaya-arabic {
+  font-family: 'Amiri', 'Traditional Arabic', serif;
+  font-size: 2.25rem;
+  line-height: 2.1;
+  color: #F5E6C8;
+  text-align: center;
+  direction: rtl;
+  unicode-bidi: bidi-override;
+  width: 100%;
+  padding: 0 0.5rem;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 12px rgba(245, 230, 200, 0.12);
+}
+
+/* Divider */
+.wiqaya-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.25), transparent);
+  margin: 1.5rem 0 1.25rem;
+}
+
+/* Verse reference */
+.wiqaya-reference {
+  text-align: center;
+  color: rgba(180, 160, 130, 0.7);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-family: system-ui, sans-serif;
+  margin-bottom: 1.25rem;
+}
+
+.wiqaya-reference-arabic {
+  direction: rtl;
+  font-family: 'Amiri', serif;
+  font-size: 0.9rem;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: rgba(212, 175, 55, 0.55);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+/* Reveal translation button */
+.wiqaya-reveal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.65);
+  padding: 0.6rem 1.5rem;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: system-ui, sans-serif;
+  margin-top: 0.25rem;
+}
+
+.wiqaya-reveal-btn:hover {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(212, 175, 55, 0.35);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.wiqaya-reveal-btn-icon {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+/* Translation text */
+.wiqaya-translation {
+  animation: slideUp 0.5s ease-out forwards;
+  font-family: 'Cormorant Garamond', 'Georgia', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.85;
+  color: #C4B5A0;
+  text-align: center;
+  padding: 0 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.wiqaya-translation-source {
+  font-family: system-ui, sans-serif;
+  font-style: normal;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: rgba(180, 160, 130, 0.45);
+  text-align: center;
+  margin-top: 0.75rem;
+  text-transform: uppercase;
+}
+
+/* Bookmark button */
+.wiqaya-bookmark-btn {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  color: rgba(212, 175, 55, 0.35);
+  font-size: 1.15rem;
+}
+
+.wiqaya-bookmark-btn:hover {
+  color: rgba(212, 175, 55, 0.7);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.wiqaya-bookmark-btn.wiqaya-bookmarked {
+  color: #D4AF37;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+}
+
+/* ==============================
+   AUDIO PLAYER
+   ============================== */
+
+.wiqaya-audio-player {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  padding: 0.6rem 1.25rem 0.6rem 0.6rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+.wiqaya-audio-play-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.12));
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+  color: rgba(212, 175, 55, 0.9);
+  font-size: 0.8rem;
+}
+
+.wiqaya-audio-play-btn:hover {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.4), rgba(212, 175, 55, 0.2));
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.2);
+}
+
+.wiqaya-audio-play-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.wiqaya-audio-label {
+  font-family: system-ui, sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  flex: 1;
+  white-space: nowrap;
+}
+
+.wiqaya-audio-progress {
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.wiqaya-audio-progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, rgba(212, 175, 55, 0.7), rgba(212, 175, 55, 0.4));
+  border-radius: 9999px;
+  transition: width 0.3s linear;
+}
+
+.wiqaya-audio-time {
+  font-family: system-ui, sans-serif;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.35);
+  white-space: nowrap;
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+/* ==============================
+   CONTINUE BUTTON
+   ============================== */
+
+.wiqaya-continue-btn {
+  animation: fadeInUp 0.4s ease-out forwards;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.75rem 2.25rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: system-ui, sans-serif;
+}
+
+.wiqaya-continue-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ==============================
+   LOADING & ERROR STATES
+   ============================== */
+
+.wiqaya-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 3rem 2rem;
+}
+
+.wiqaya-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid rgba(212, 175, 55, 0.15);
+  border-top-color: rgba(212, 175, 55, 0.7);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+.wiqaya-loading-text {
+  font-family: 'Amiri', serif;
+  font-size: 1.1rem;
+  color: rgba(245, 230, 200, 0.5);
+  letter-spacing: 0.05em;
+  direction: rtl;
+}
+
+.wiqaya-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2.5rem 2rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: system-ui, sans-serif;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.wiqaya-error-icon {
+  font-size: 1.5rem;
+  opacity: 0.5;
+}
+
+/* ==============================
+   KEYFRAME ANIMATIONS
+   ============================== */
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+  }
+  50% {
+    box-shadow: 0 0 12px 2px rgba(212, 175, 55, 0.15);
+  }
+}
