@@ -1,4 +1,4 @@
-import { CONTENT_API, CONTENT_CONTENT_TOKEN_URL, CONTENT_CONTENT_CLIENT_ID, CONTENT_CONTENT_CLIENT_SECRET } from '../shared/constants'
+import { CONTENT_API, CONTENT_TOKEN_URL, CONTENT_CLIENT_ID, CONTENT_CLIENT_SECRET } from '../shared/constants'
 import { getStorage, setStorage } from '../shared/storage'
 import type { VerseData } from '../shared/types'
 
