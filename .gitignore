@@ -5,3 +5,4 @@ apikey
 *.pem
 .DS_Store
 *.local
+docs/superpowers/
