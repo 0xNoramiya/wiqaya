@@ -30,6 +30,9 @@
       "128": "public/icons/icon-128.png"
     }
   },
+  "externally_connectable": {
+    "matches": ["https://0xnoramiya.github.io/*"]
+  },
   "icons": {
     "16": "public/icons/icon-16.png",
     "48": "public/icons/icon-48.png",

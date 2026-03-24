@@ -29,8 +29,7 @@ export async function startLogin(): Promise<boolean> {
   const challenge = await generateCodeChallenge(verifier)
   const state = generateState()
 
-  // Use http://localhost which is pre-registered with the OAuth2 provider
-  const redirectUrl = 'http://localhost'
+  const redirectUrl = 'https://0xnoramiya.github.io/wiqaya/callback.html'
 
   const params = new URLSearchParams({
     response_type: 'code',

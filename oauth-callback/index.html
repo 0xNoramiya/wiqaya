@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wiqaya — Login</title>
+  <style>
+    body { font-family: system-ui; background: #0f172a; color: #e2e8f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    .card { text-align: center; padding: 2rem; }
+    p { font-size: 1.1rem; }
+    .sub { font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <p id="status">Completing login...</p>
+    <p class="sub" id="sub">Please wait</p>
+  </div>
+  <script>
+    // Extract auth code from URL and send to the Wiqaya extension
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const state = params.get('state');
+    const error = params.get('error');
+
+    if (error) {
+      document.getElementById('status').textContent = 'Login failed';
+      document.getElementById('sub').textContent = params.get('error_description') || error;
+    } else if (code && state) {
+      // Try to send to the extension via chrome.runtime.sendMessage
+      // The extension ID is stored in localStorage by the popup before login
+      const extId = localStorage.getItem('wiqaya_ext_id');
+      if (extId && chrome && chrome.runtime && chrome.runtime.sendMessage) {
+        chrome.runtime.sendMessage(extId, { type: 'AUTH_CALLBACK', code, state }, function(response) {
+          if (response && response.success) {
+            document.getElementById('status').textContent = 'Logged in successfully!';
+            document.getElementById('sub').textContent = 'You can close this tab.';
+          } else {
+            document.getElementById('status').textContent = 'Login failed';
+            document.getElementById('sub').textContent = 'Could not connect to extension.';
+          }
+        });
+      } else {
+        // Fallback: show code for manual entry or use postMessage
+        document.getElementById('status').textContent = 'Login received!';
+        document.getElementById('sub').textContent = 'Return to the Wiqaya extension to complete login.';
+        // Store in sessionStorage so extension popup can read it
+        sessionStorage.setItem('wiqaya_auth_code', code);
+        sessionStorage.setItem('wiqaya_auth_state', state);
+      }
+    } else {
+      document.getElementById('status').textContent = 'Login error';
+      document.getElementById('sub').textContent = 'Missing authorization parameters.';
+    }
+  </script>
+</body>
+</html>
