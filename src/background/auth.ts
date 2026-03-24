@@ -29,7 +29,7 @@ export async function startLogin(): Promise<boolean> {
   const challenge = await generateCodeChallenge(verifier)
   const state = generateState()
 
-  const redirectUrl = 'https://0xnoramiya.github.io/wiqaya/callback.html'
+  const redirectUrl = 'https://0xnoramiya.github.io/wiqaya/docs/callback.html'
 
   const params = new URLSearchParams({
     response_type: 'code',
