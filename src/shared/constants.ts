@@ -24,6 +24,6 @@ export const MUSHAF_ID = 1
 
 export const DEFAULT_TRANSLATION_ID = 85
 export const DEFAULT_RECITATION_ID = 7
-export const DEFAULT_TIME_LIMIT_MINUTES = 0.1 // ~6 seconds for testing
+export const DEFAULT_TIME_LIMIT_MINUTES = 1
 export const ENGAGEMENT_DELAY_MS = 30000
 export const GRACE_PERIOD_MINUTES = 10
