@@ -19,11 +19,14 @@ function LoadingSpinner() {
   )
 }
 
-function ErrorState() {
+function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="wiqaya-error">
       <span className="wiqaya-error-icon">✦</span>
       <p>Could not load verse. Please try again.</p>
+      <button onClick={onRetry} className="wiqaya-reveal-btn" style={{ marginTop: '1rem' }}>
+        Try Again
+      </button>
     </div>
   )
 }
@@ -39,11 +42,17 @@ export default function App({ onDismiss }: Props) {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [autoPlay, setAutoPlay] = useState(false)
 
-  useEffect(() => {
+  const fetchVerse = () => {
+    setLoading(true)
+    setVerse(null)
     chrome.runtime.sendMessage({ type: 'GET_VERSE' }, (response) => {
       if (response?.data) setVerse(response.data)
       setLoading(false)
     })
+  }
+
+  useEffect(() => {
+    fetchVerse()
 
     // Read theme and autoPlayAudio setting
     chrome.storage.local.get(['theme', 'autoPlayAudio'], (result) => {
@@ -139,7 +148,7 @@ export default function App({ onDismiss }: Props) {
             )}
           </>
         ) : (
-          <ErrorState />
+          <ErrorState onRetry={fetchVerse} />
         )}
       </div>
     </div>

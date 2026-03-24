@@ -46,17 +46,21 @@ export default function Dashboard() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
 
   useEffect(() => {
-    chrome.storage.local.get(
-      ['siteTimeEntries', 'versesReadToday', 'totalVersesRead', 'trackedSites'],
-      (result) => {
-        setData({
-          siteTimeEntries: result.siteTimeEntries ?? {},
-          versesReadToday: result.versesReadToday ?? 0,
-          totalVersesRead: result.totalVersesRead ?? 0,
-          trackedSites: result.trackedSites ?? [],
-        })
-      }
-    )
+    function loadData() {
+      chrome.storage.local.get(
+        ['siteTimeEntries', 'versesReadToday', 'totalVersesRead', 'trackedSites'],
+        (result) => {
+          setData({
+            siteTimeEntries: result.siteTimeEntries ?? {},
+            versesReadToday: result.versesReadToday ?? 0,
+            totalVersesRead: result.totalVersesRead ?? 0,
+            trackedSites: result.trackedSites ?? [],
+          })
+        }
+      )
+    }
+
+    loadData()
 
     chrome.runtime.sendMessage({ type: 'GET_AUTH_STATUS' }, (response) => {
       const loggedIn = response?.isLoggedIn ?? false
@@ -75,8 +79,17 @@ export default function Dashboard() {
     chrome.storage.local.get(['theme'], (result) => {
       setTheme(result.theme ?? 'dark')
     })
+
     const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
       if (changes.theme) setTheme(changes.theme.newValue ?? 'dark')
+      if (
+        changes.siteTimeEntries ||
+        changes.versesReadToday ||
+        changes.totalVersesRead ||
+        changes.trackedSites
+      ) {
+        loadData()
+      }
     }
     chrome.storage.onChanged.addListener(listener)
     return () => chrome.storage.onChanged.removeListener(listener)
@@ -89,8 +102,49 @@ export default function Dashboard() {
     (e) => e.date === today
   )
 
+  const isOnboarding =
+    data.trackedSites.length === 0 &&
+    data.versesReadToday === 0 &&
+    data.totalVersesRead === 0
+
   return (
     <div className="p-4 flex flex-col gap-3">
+
+      {/* Onboarding welcome card */}
+      {isOnboarding && (
+        <div
+          className="gold-card p-5 flex flex-col items-center gap-3 text-center"
+          style={{
+            borderColor: 'rgba(212,175,55,0.35)',
+            background: isLight
+              ? 'linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(20,184,166,0.06) 100%)'
+              : 'linear-gradient(135deg, rgba(212,175,55,0.10) 0%, rgba(20,184,166,0.08) 100%)',
+          }}
+        >
+          <span style={{ fontSize: 36, lineHeight: 1 }}>🛡️</span>
+          <div>
+            <h2
+              className="text-base font-bold mb-1"
+              style={{ color: isLight ? '#1a1a2e' : 'white' }}
+            >
+              Welcome to Wiqaya
+            </h2>
+            <p className="text-sm" style={{ color: isLight ? '#6b6b7b' : '#94a3b8' }}>
+              Start by adding distracting sites to your watch list
+            </p>
+          </div>
+          <div
+            className="rounded-xl px-4 py-2 text-sm font-medium"
+            style={{
+              background: isLight ? 'rgba(212,175,55,0.12)' : 'rgba(212,175,55,0.15)',
+              color: '#D4AF37',
+              border: '1px solid rgba(212,175,55,0.3)',
+            }}
+          >
+            Go to the <strong>Sites</strong> tab to add websites you want to track
+          </div>
+        </div>
+      )}
 
       {/* Verses Read — hero stat */}
       <div className="gold-card card-hover p-4">
