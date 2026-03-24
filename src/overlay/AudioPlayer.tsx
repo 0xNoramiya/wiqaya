@@ -3,6 +3,7 @@ import { useRef, useState, useEffect } from 'react'
 interface Props {
   audioUrl: string | null
   onPlay: () => void
+  autoPlay?: boolean
 }
 
 function formatTime(seconds: number): string {
@@ -30,7 +31,7 @@ function extractReciter(url: string): string {
   }
 }
 
-export default function AudioPlayer({ audioUrl, onPlay }: Props) {
+export default function AudioPlayer({ audioUrl, onPlay, autoPlay }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0)       // 0–100
@@ -59,10 +60,24 @@ export default function AudioPlayer({ audioUrl, onPlay }: Props) {
     }
     const handleCanPlay = () => setIsLoading(false)
 
+    const handleCanPlayThrough = () => {
+      if (autoPlay && !hasPlayed) {
+        audio.play().then(() => {
+          setIsPlaying(true)
+          setIsLoading(false)
+          setHasPlayed(true)
+          onPlay()
+        }).catch(() => {
+          // Browser may block autoplay — that's fine, user can click
+        })
+      }
+    }
+
     audio.addEventListener('loadedmetadata', handleLoadedMetadata)
     audio.addEventListener('timeupdate', handleTimeUpdate)
     audio.addEventListener('ended', handleEnded)
     audio.addEventListener('canplay', handleCanPlay)
+    audio.addEventListener('canplaythrough', handleCanPlayThrough)
 
     return () => {
       audio.pause()
@@ -70,6 +85,7 @@ export default function AudioPlayer({ audioUrl, onPlay }: Props) {
       audio.removeEventListener('timeupdate', handleTimeUpdate)
       audio.removeEventListener('ended', handleEnded)
       audio.removeEventListener('canplay', handleCanPlay)
+      audio.removeEventListener('canplaythrough', handleCanPlayThrough)
     }
   }, [audioUrl])
 

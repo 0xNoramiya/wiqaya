@@ -37,6 +37,7 @@ export default function App({ onDismiss }: Props) {
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [visible, setVisible] = useState(false)
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const [autoPlay, setAutoPlay] = useState(false)
 
   useEffect(() => {
     chrome.runtime.sendMessage({ type: 'GET_VERSE' }, (response) => {
@@ -44,9 +45,10 @@ export default function App({ onDismiss }: Props) {
       setLoading(false)
     })
 
-    // Read theme
-    chrome.storage.local.get(['theme'], (result) => {
+    // Read theme and autoPlayAudio setting
+    chrome.storage.local.get(['theme', 'autoPlayAudio'], (result) => {
       setTheme(result.theme ?? 'dark')
+      setAutoPlay(result.autoPlayAudio ?? false)
     })
 
     // Start 30s engagement timer
@@ -126,6 +128,7 @@ export default function App({ onDismiss }: Props) {
             <AudioPlayer
               audioUrl={verse.audioUrl}
               onPlay={() => setAudioPlayed(true)}
+              autoPlay={autoPlay}
             />
 
             {isEngaged && (

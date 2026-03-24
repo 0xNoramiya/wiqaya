@@ -265,16 +265,14 @@ export default function Settings() {
             className="text-sm font-semibold"
             style={{ color: '#14b8a6' }}
           >
-            {settings.globalTimeLimitMinutes < 1
-              ? `${Math.round(settings.globalTimeLimitMinutes * 60)}s`
-              : `${settings.globalTimeLimitMinutes} min`}
+            {settings.globalTimeLimitMinutes} min
           </span>
         </div>
         <input
           type="range"
-          min={0.1}
+          min={1}
           max={60}
-          step={0.1}
+          step={1}
           value={settings.globalTimeLimitMinutes}
           onChange={(e) =>
             update('globalTimeLimitMinutes', Number(e.target.value))
@@ -285,11 +283,11 @@ export default function Settings() {
         {/* Tick marks */}
         <div className="slider-ticks">
           {[
-            { label: '6s', pos: ((0.1 - 0.1) / (60 - 0.1)) * 100 },
-            { label: '5m', pos: ((5 - 0.1) / (60 - 0.1)) * 100 },
-            { label: '15m', pos: ((15 - 0.1) / (60 - 0.1)) * 100 },
-            { label: '30m', pos: ((30 - 0.1) / (60 - 0.1)) * 100 },
-            { label: '60m', pos: ((60 - 0.1) / (60 - 0.1)) * 100 },
+            { label: '1m' },
+            { label: '5m' },
+            { label: '15m' },
+            { label: '30m' },
+            { label: '60m' },
           ].map(({ label }) => (
             <div key={label} className="tick-mark">
               <span>{label}</span>
