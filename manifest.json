@@ -8,7 +8,9 @@
     "https://apis.quran.foundation/*",
     "https://apis-prelive.quran.foundation/*",
     "https://oauth2.quran.foundation/*",
-    "https://prelive-oauth2.quran.foundation/*"
+    "https://prelive-oauth2.quran.foundation/*",
+    "https://audio.qurancdn.com/*",
+    "https://verses.quran.com/*"
   ],
   "background": {
     "service_worker": "src/background/index.ts",

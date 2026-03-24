@@ -159,7 +159,11 @@ export async function fetchRandomVerse(): Promise<VerseData> {
     )
     if (audioResponse.ok) {
       const audioData = await audioResponse.json()
-      audioUrl = audioData.audio_files?.[0]?.url || null
+      const rawUrl = audioData.audio_files?.[0]?.url || null
+      if (rawUrl) {
+        // API returns relative paths like "Alafasy/mp3/002255.mp3" — prepend CDN base
+        audioUrl = rawUrl.startsWith('http') ? rawUrl : `https://audio.qurancdn.com/${rawUrl}`
+      }
     }
   } catch {
     console.warn('Audio fetch failed')

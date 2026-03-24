@@ -61,8 +61,8 @@
 .wiqaya-content {
   position: relative;
   z-index: 1;
-  max-width: 620px;
-  width: 90%;
+  max-width: 860px;
+  width: 92%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -83,7 +83,7 @@
     0 0 0 1px rgba(255, 255, 255, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
   overflow: hidden;
-  padding: 2.5rem 2rem 2rem;
+  padding: 3rem 3rem 2.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -118,8 +118,8 @@
 /* Arabic text — the hero */
 .wiqaya-arabic {
   font-family: 'Amiri', 'Traditional Arabic', serif;
-  font-size: 2.25rem;
-  line-height: 2.1;
+  font-size: 2.75rem;
+  line-height: 2.2;
   color: #F5E6C8;
   text-align: center;
   direction: rtl;
@@ -196,8 +196,8 @@
   animation: slideUp 0.5s ease-out forwards;
   font-family: 'Cormorant Garamond', 'Georgia', serif;
   font-style: italic;
-  font-size: 1.1rem;
-  line-height: 1.85;
+  font-size: 1.25rem;
+  line-height: 1.9;
   color: #C4B5A0;
   text-align: center;
   padding: 0 0.5rem;
