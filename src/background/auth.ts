@@ -29,8 +29,8 @@ export async function startLogin(): Promise<boolean> {
   const challenge = await generateCodeChallenge(verifier)
   const state = generateState()
 
-  // Use chrome.identity redirect URL — no registration needed for this format
-  const redirectUrl = chrome.identity.getRedirectURL()
+  // Use http://localhost which is pre-registered with the OAuth2 provider
+  const redirectUrl = 'http://localhost'
 
   const params = new URLSearchParams({
     response_type: 'code',
