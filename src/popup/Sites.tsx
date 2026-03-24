@@ -28,17 +28,18 @@ function domainColor(domain: string): string {
 
 export default function Sites() {
   const [sites, setSites] = useState<TrackedSite[]>([])
+  const [globalLimit, setGlobalLimit] = useState(15)
   const [domainInput, setDomainInput] = useState('')
   const [limitInput, setLimitInput] = useState('15')
   const [error, setError] = useState('')
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
 
   useEffect(() => {
-    chrome.storage.local.get(['trackedSites'], (result) => {
+    chrome.storage.local.get(['trackedSites', 'globalTimeLimitMinutes', 'theme'], (result) => {
       setSites(result.trackedSites ?? [])
-    })
-
-    chrome.storage.local.get(['theme'], (result) => {
+      const gl = result.globalTimeLimitMinutes ?? 15
+      setGlobalLimit(gl)
+      setLimitInput(String(gl))
       setTheme(result.theme ?? 'dark')
     })
     const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
@@ -68,7 +69,7 @@ export default function Sites() {
     setError('')
     saveSites([...sites, { domain: d, timeLimitMinutes: limitMinutes }])
     setDomainInput('')
-    setLimitInput('15')
+    setLimitInput(String(globalLimit))
   }
 
   function removeSite(domain: string) {
@@ -87,7 +88,7 @@ export default function Sites() {
 
   function quickAdd(domain: string) {
     if (sites.some((s) => s.domain === domain)) return
-    saveSites([...sites, { domain, timeLimitMinutes: 15 }])
+    saveSites([...sites, { domain, timeLimitMinutes: globalLimit }])
   }
 
   const inputBg = isLight ? '#f5f0e8' : 'rgba(255,255,255,0.05)'
