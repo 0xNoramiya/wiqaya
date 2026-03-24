@@ -27,6 +27,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       dismissOverlay()
       sendResponse({ type: 'DISMISS_OVERLAY' })
     }
+    return true
   }
 
   if (message.type === 'START_LOGIN') {

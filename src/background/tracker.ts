@@ -92,17 +92,27 @@ async function getActiveTabInfo(): Promise<{ tabId: number | null; domain: strin
 
 /**
  * Reset time entries whose stored date doesn't match today (daily reset).
+ * Also resets versesReadToday when the date has rolled over.
  */
 async function resetStaleEntries(): Promise<void> {
   const today = todayString()
-  const { siteTimeEntries } = await getStorage(['siteTimeEntries'])
+  const { siteTimeEntries, lastTrackedDate } = await getStorage(['siteTimeEntries', 'lastTrackedDate'])
   let changed = false
+
+  // Reset stale site time entries
   for (const domain of Object.keys(siteTimeEntries)) {
     if (siteTimeEntries[domain].date !== today) {
       siteTimeEntries[domain] = { domain, timeSpentMs: 0, date: today }
       changed = true
     }
   }
+
+  // Reset versesReadToday if the date has changed since we last tracked
+  if (lastTrackedDate !== today) {
+    await setStorage({ siteTimeEntries, versesReadToday: 0, lastTrackedDate: today })
+    return
+  }
+
   if (changed) {
     await setStorage({ siteTimeEntries })
   }

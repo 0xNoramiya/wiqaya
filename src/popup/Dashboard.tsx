@@ -9,8 +9,8 @@ interface DashboardData {
 }
 
 interface StreakData {
-  currentStreak?: number
-  longestStreak?: number
+  days?: number
+  status?: string
 }
 
 function formatTime(ms: number): string {
@@ -53,7 +53,7 @@ export default function Dashboard() {
 
       if (loggedIn) {
         chrome.runtime.sendMessage({ type: 'GET_STREAKS' }, (streakResponse) => {
-          setStreak(streakResponse ?? null)
+          setStreak(streakResponse?.streak ?? null)
           setLoadingStreak(false)
         })
       } else {
@@ -168,14 +168,9 @@ export default function Dashboard() {
                 className="text-3xl font-bold"
                 style={{ color: '#D4AF37' }}
               >
-                {streak.currentStreak ?? 0}
+                {streak.days ?? 0}
               </span>
               <span className="text-slate-400 text-sm ml-1">days</span>
-              {streak.longestStreak != null && (
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Best: {streak.longestStreak} days
-                </p>
-              )}
             </div>
           </div>
         ) : (

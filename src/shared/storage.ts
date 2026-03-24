@@ -15,6 +15,7 @@ const DEFAULTS: WiqayaStorage = {
   tokenExpiresAt: null,
   contentAccessToken: null,
   contentTokenExpiresAt: null,
+  lastTrackedDate: null,
 }
 
 export async function getStorage<K extends keyof WiqayaStorage>(

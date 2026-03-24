@@ -35,6 +35,7 @@ export interface WiqayaStorage {
   tokenExpiresAt: number | null
   contentAccessToken: string | null
   contentTokenExpiresAt: number | null
+  lastTrackedDate: string | null
 }
 
 export interface Bookmark {
