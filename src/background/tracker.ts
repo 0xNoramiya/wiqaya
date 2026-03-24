@@ -3,7 +3,7 @@ import { GRACE_PERIOD_MINUTES } from '../shared/constants'
 import type { SiteTimeEntry, TrackedSite } from '../shared/types'
 
 const ALARM_NAME = 'wiqaya-tick'
-const TICK_PERIOD_MINUTES = 0.25 // every 15 seconds
+const TICK_PERIOD_MINUTES = 0.08 // ~5 seconds for testing
 
 // In-memory state (rehydrated from storage on each alarm tick since SW can be killed)
 let currentTrackedTabId: number | null = null

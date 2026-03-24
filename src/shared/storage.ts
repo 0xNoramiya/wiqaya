@@ -7,7 +7,7 @@ const DEFAULTS: WiqayaStorage = {
   siteTimeEntries: {},
   versesReadToday: 0,
   totalVersesRead: 0,
-  translationId: 131,
+  translationId: 85,
   recitationId: 7,
   autoPlayAudio: false,
   accessToken: null,

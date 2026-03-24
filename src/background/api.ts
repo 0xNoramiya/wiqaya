@@ -89,11 +89,12 @@ export async function fetchRandomVerse(): Promise<VerseData> {
   const token = await getContentToken()
   const { translationId, recitationId } = await getStorage(['translationId', 'recitationId'])
 
-  const effectiveTranslationId = translationId ?? 131
+  const effectiveTranslationId = translationId ?? 85
   const effectiveRecitationId = recitationId ?? 7
 
+  // 1. Fetch random verse (text_uthmani only — translations come from separate endpoint)
   const verseResponse = await fetch(
-    `${CONTENT_API}/verses/random?translations=${effectiveTranslationId}&fields=text_uthmani&language=en`,
+    `${CONTENT_API}/verses/random?fields=text_uthmani&language=en`,
     {
       headers: {
         'x-auth-token': token,
@@ -112,6 +113,31 @@ export async function fetchRandomVerse(): Promise<VerseData> {
   const verseKey: string = verse.verse_key
   const chapterNumber = parseInt(verseKey.split(':')[0])
 
+  // 2. Fetch translation separately via /quran/translations/{id}?verse_key={key}
+  let translationText = ''
+  let translationName = 'Unknown'
+  try {
+    const translationResponse = await fetch(
+      `${CONTENT_API}/quran/translations/${effectiveTranslationId}?verse_key=${verseKey}`,
+      {
+        headers: {
+          'x-auth-token': token,
+          'x-client-id': CLIENT_ID,
+        },
+      }
+    )
+    if (translationResponse.ok) {
+      const translationData = await translationResponse.json()
+      translationText = translationData.translations?.[0]?.text || ''
+      translationName = translationData.meta?.translation_name || 'Unknown'
+      // Strip HTML tags from translation text
+      translationText = translationText.replace(/<[^>]*>/g, '')
+    }
+  } catch {
+    console.warn('Translation fetch failed')
+  }
+
+  // 3. Get chapter info
   const chapters = await getChapters()
   const chapter = chapters.find((c) => c.id === chapterNumber)
 
@@ -119,22 +145,24 @@ export async function fetchRandomVerse(): Promise<VerseData> {
     throw new Error(`Chapter ${chapterNumber} not found in cache`)
   }
 
-  const audioResponse = await fetch(
-    `${CONTENT_API}/recitations/${effectiveRecitationId}/by_ayah/${verseKey}`,
-    {
-      headers: {
-        'x-auth-token': token,
-        'x-client-id': CLIENT_ID,
-      },
+  // 4. Fetch audio
+  let audioUrl: string | null = null
+  try {
+    const audioResponse = await fetch(
+      `${CONTENT_API}/recitations/${effectiveRecitationId}/by_ayah/${verseKey}`,
+      {
+        headers: {
+          'x-auth-token': token,
+          'x-client-id': CLIENT_ID,
+        },
+      }
+    )
+    if (audioResponse.ok) {
+      const audioData = await audioResponse.json()
+      audioUrl = audioData.audio_files?.[0]?.url || null
     }
-  )
-
-  let audioFiles: Array<{ url: string }> = []
-  if (audioResponse.ok) {
-    const audioData = await audioResponse.json()
-    audioFiles = audioData.audio_files || []
-  } else {
-    console.warn(`Audio request failed: ${audioResponse.status} ${audioResponse.statusText}`)
+  } catch {
+    console.warn('Audio fetch failed')
   }
 
   return {
@@ -142,10 +170,10 @@ export async function fetchRandomVerse(): Promise<VerseData> {
     chapterNumber,
     verseNumber: parseInt(verseKey.split(':')[1]),
     textUthmani: verse.text_uthmani,
-    translationText: verse.translations[0]?.text || '',
-    translationName: verse.translations[0]?.resource_name || 'Unknown',
+    translationText,
+    translationName,
     chapterNameArabic: chapter.name_arabic,
     chapterNameSimple: chapter.name_simple,
-    audioUrl: audioFiles[0]?.url || null,
+    audioUrl,
   }
 }

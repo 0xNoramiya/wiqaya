@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import type { WiqayaStorage } from '../shared/types'
 
 const TRANSLATIONS = [
-  { id: 131, label: '131 — Sahih International' },
-  { id: 20, label: '20 — Saheeh International (alt)' },
-  { id: 19, label: '19 — Pickthall' },
-  { id: 22, label: '22 — Yusuf Ali' },
-  { id: 85, label: '85 — Abdul Haleem' },
+  { id: 85, label: 'M.A.S. Abdel Haleem' },
+  { id: 19, label: 'M. Pickthall' },
+  { id: 84, label: 'T. Usmani' },
+  { id: 95, label: 'A. Maududi (Tafhim)' },
+  { id: 149, label: 'Fadel Soliman (Bridges)' },
 ]
 
 const RECITERS = [
@@ -24,7 +24,7 @@ type SettingsState = Pick<
 
 export default function Settings() {
   const [settings, setSettings] = useState<SettingsState>({
-    translationId: 131,
+    translationId: 85,
     recitationId: 7,
     autoPlayAudio: false,
     globalTimeLimitMinutes: 15,
@@ -38,7 +38,7 @@ export default function Settings() {
       ['translationId', 'recitationId', 'autoPlayAudio', 'globalTimeLimitMinutes'],
       (result) => {
         setSettings({
-          translationId: result.translationId ?? 131,
+          translationId: result.translationId ?? 85,
           recitationId: result.recitationId ?? 7,
           autoPlayAudio: result.autoPlayAudio ?? false,
           globalTimeLimitMinutes: result.globalTimeLimitMinutes ?? 15,
@@ -147,14 +147,14 @@ export default function Settings() {
             Global Time Limit
           </label>
           <span className="text-teal-400 text-sm font-medium">
-            {settings.globalTimeLimitMinutes} min
+            {settings.globalTimeLimitMinutes < 1 ? `${Math.round(settings.globalTimeLimitMinutes * 60)}s` : `${settings.globalTimeLimitMinutes} min`}
           </span>
         </div>
         <input
           type="range"
-          min={5}
+          min={0.1}
           max={60}
-          step={5}
+          step={0.1}
           value={settings.globalTimeLimitMinutes}
           onChange={(e) =>
             update('globalTimeLimitMinutes', Number(e.target.value))
@@ -162,7 +162,7 @@ export default function Settings() {
           className="w-full accent-teal-500 cursor-pointer"
         />
         <div className="flex justify-between text-xs text-slate-500 mt-1">
-          <span>5m</span>
+          <span>6s</span>
           <span>60m</span>
         </div>
       </div>
