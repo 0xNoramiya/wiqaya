@@ -36,6 +36,7 @@ export interface WiqayaStorage {
   contentAccessToken: string | null
   contentTokenExpiresAt: number | null
   lastTrackedDate: string | null
+  theme: 'dark' | 'light'
 }
 
 export interface Bookmark {

@@ -905,3 +905,213 @@
   0%, 100% { opacity: 0.55; }
   50% { opacity: 0.85; }
 }
+
+/* ==============================
+   LIGHT MODE OVERLAY
+   ============================== */
+
+/* Backdrop: creamy white, warm and soft */
+.wiqaya-overlay.wiqaya-light .wiqaya-backdrop {
+  background: rgba(245, 243, 238, 0.92);
+}
+
+/* Backdrop glow: warm amber, lighter */
+.wiqaya-overlay.wiqaya-light .wiqaya-backdrop-glow {
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 50%,
+    rgba(212, 175, 55, 0.09) 0%,
+    rgba(180, 130, 30, 0.05) 45%,
+    transparent 75%
+  );
+}
+
+/* Particles: gold, slightly reduced opacity for light bg */
+.wiqaya-overlay.wiqaya-light .wiqaya-particle {
+  background: rgba(180, 130, 20, 0.45);
+}
+
+/* Card: warm white with gold border */
+.wiqaya-overlay.wiqaya-light .wiqaya-card {
+  background: linear-gradient(160deg, #ffffff 0%, #faf7f2 40%, #f5f0e8 75%, #f0ebe0 100%);
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(212, 175, 55, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(212, 175, 55, 0.08);
+}
+
+/* Card texture: very subtle on light */
+.wiqaya-overlay.wiqaya-light .wiqaya-card::before {
+  background-image: repeating-conic-gradient(
+    rgba(0,0,0,0.008) 0% 25%,
+    transparent 0% 50%
+  );
+}
+
+/* Card border: warm gold shimmer — keep existing animation, just slightly warmer */
+.wiqaya-overlay.wiqaya-light .wiqaya-card-border {
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    rgba(212, 175, 55, 0.0) 0%,
+    rgba(212, 175, 55, 0.65) 20%,
+    rgba(180, 140, 60, 0.9) 35%,
+    rgba(212, 175, 55, 0.65) 50%,
+    rgba(212, 175, 55, 0.0) 65%,
+    rgba(212, 175, 55, 0.0) 100%
+  );
+}
+
+/* Arabic text: deep navy — classic mushaf feel, dark ink on cream */
+.wiqaya-overlay.wiqaya-light .wiqaya-arabic {
+  color: #1a1a2e;
+  text-shadow:
+    0 2px 18px rgba(26, 26, 46, 0.06),
+    0 0 40px rgba(212, 175, 55, 0.04);
+}
+
+/* Shimmer on Arabic: slightly visible on light */
+.wiqaya-overlay.wiqaya-light .wiqaya-arabic::after {
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(212, 175, 55, 0.06) 50%,
+    transparent 70%
+  );
+}
+
+/* Divider: warm gold */
+.wiqaya-overlay.wiqaya-light .wiqaya-divider {
+  background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.4), transparent);
+}
+
+/* Ornament lines */
+.wiqaya-overlay.wiqaya-light .wiqaya-card-ornament-line {
+  background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.55), transparent);
+}
+
+/* Ornament diamond */
+.wiqaya-overlay.wiqaya-light .wiqaya-card-ornament-diamond {
+  background: rgba(180, 130, 20, 0.6);
+}
+
+/* Ornament symbol */
+.wiqaya-overlay.wiqaya-light .wiqaya-card-ornament-symbol {
+  color: rgba(180, 130, 20, 0.9);
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+}
+
+/* Corner decorations */
+.wiqaya-overlay.wiqaya-light .wiqaya-corner {
+  opacity: 0.45;
+}
+
+/* Reference arabic text */
+.wiqaya-overlay.wiqaya-light .wiqaya-reference-arabic {
+  color: rgba(160, 126, 32, 0.8);
+}
+
+/* Reference badge */
+.wiqaya-overlay.wiqaya-light .wiqaya-reference-badge {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.25);
+  color: #8a7a6a;
+}
+
+/* Reference dot */
+.wiqaya-overlay.wiqaya-light .wiqaya-reference-dot {
+  background: rgba(180, 130, 20, 0.5);
+}
+
+/* Translation text: warm charcoal */
+.wiqaya-overlay.wiqaya-light .wiqaya-translation {
+  color: #4a4a5a;
+}
+
+/* Opening quote mark */
+.wiqaya-overlay.wiqaya-light .wiqaya-translation-wrapper::before {
+  color: rgba(212, 175, 55, 0.06);
+}
+
+/* Translation source */
+.wiqaya-overlay.wiqaya-light .wiqaya-translation-source {
+  color: rgba(138, 122, 106, 0.6);
+}
+
+/* Reveal button */
+.wiqaya-overlay.wiqaya-light .wiqaya-reveal-btn {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.3);
+  color: #5a4a2a;
+}
+.wiqaya-overlay.wiqaya-light .wiqaya-reveal-btn:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: rgba(212, 175, 55, 0.55);
+  color: #2a1a0a;
+  box-shadow: 0 0 22px rgba(212, 175, 55, 0.2), 0 0 6px rgba(212, 175, 55, 0.1);
+}
+
+/* Bookmark button */
+.wiqaya-overlay.wiqaya-light .wiqaya-bookmark-btn {
+  color: rgba(180, 130, 20, 0.4);
+}
+.wiqaya-overlay.wiqaya-light .wiqaya-bookmark-btn:hover {
+  color: rgba(180, 130, 20, 0.8);
+  background: rgba(212, 175, 55, 0.1);
+}
+.wiqaya-overlay.wiqaya-light .wiqaya-bookmark-btn.wiqaya-bookmarked {
+  color: #b4821e;
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+}
+
+/* Audio player: warm gray background */
+.wiqaya-overlay.wiqaya-light .wiqaya-audio-player {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(212, 175, 55, 0.2);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+/* Audio label */
+.wiqaya-overlay.wiqaya-light .wiqaya-audio-label {
+  color: rgba(26, 26, 46, 0.45);
+}
+
+/* Audio reciter */
+.wiqaya-overlay.wiqaya-light .wiqaya-audio-reciter {
+  color: #4a4a5a;
+}
+
+/* Audio time */
+.wiqaya-overlay.wiqaya-light .wiqaya-audio-time {
+  color: rgba(26, 26, 46, 0.4);
+}
+
+/* Audio progress track */
+.wiqaya-overlay.wiqaya-light .wiqaya-audio-progress {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* Continue button */
+.wiqaya-overlay.wiqaya-light .wiqaya-continue-btn {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(212, 175, 55, 0.3);
+  color: #4a4a5a;
+}
+.wiqaya-overlay.wiqaya-light .wiqaya-continue-btn:hover {
+  background: rgba(212, 175, 55, 0.12);
+  border-color: rgba(212, 175, 55, 0.5);
+  color: #1a1a2e;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), 0 0 16px rgba(212, 175, 55, 0.12);
+}
+
+/* Loading state */
+.wiqaya-overlay.wiqaya-light .wiqaya-loading-text {
+  color: rgba(26, 26, 46, 0.6);
+}
+
+/* Error state */
+.wiqaya-overlay.wiqaya-light .wiqaya-error {
+  color: rgba(26, 26, 46, 0.5);
+}
+.wiqaya-overlay.wiqaya-light .wiqaya-error-icon {
+  color: rgba(180, 130, 20, 0.6);
+}

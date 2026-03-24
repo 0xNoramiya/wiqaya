@@ -19,7 +19,7 @@ const RECITERS = [
 
 type SettingsState = Pick<
   WiqayaStorage,
-  'translationId' | 'recitationId' | 'autoPlayAudio' | 'globalTimeLimitMinutes'
+  'translationId' | 'recitationId' | 'autoPlayAudio' | 'globalTimeLimitMinutes' | 'theme'
 >
 
 const cardStyle: React.CSSProperties = {
@@ -45,6 +45,7 @@ export default function Settings() {
     recitationId: 7,
     autoPlayAudio: false,
     globalTimeLimitMinutes: 15,
+    theme: 'dark',
   })
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [authLoading, setAuthLoading] = useState(true)
@@ -52,13 +53,14 @@ export default function Settings() {
 
   useEffect(() => {
     chrome.storage.local.get(
-      ['translationId', 'recitationId', 'autoPlayAudio', 'globalTimeLimitMinutes'],
+      ['translationId', 'recitationId', 'autoPlayAudio', 'globalTimeLimitMinutes', 'theme'],
       (result) => {
         setSettings({
           translationId: result.translationId ?? 85,
           recitationId: result.recitationId ?? 7,
           autoPlayAudio: result.autoPlayAudio ?? false,
           globalTimeLimitMinutes: result.globalTimeLimitMinutes ?? 15,
+          theme: result.theme ?? 'dark',
         })
       }
     )
@@ -111,6 +113,59 @@ export default function Settings() {
 
   return (
     <div className="p-4 flex flex-col gap-3">
+
+      {/* Theme */}
+      <div style={cardStyle} className="card-hover">
+        <label style={labelStyle}>Theme</label>
+        <div
+          style={{
+            display: 'flex',
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '0.625rem',
+            padding: '3px',
+            gap: '3px',
+          }}
+        >
+          {(['dark', 'light'] as const).map((option) => {
+            const isActive = settings.theme === option
+            return (
+              <button
+                key={option}
+                onClick={() => update('theme', option)}
+                style={{
+                  flex: 1,
+                  padding: '6px 0',
+                  borderRadius: '0.45rem',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  letterSpacing: '0.05em',
+                  transition: 'all 200ms ease',
+                  background: isActive
+                    ? option === 'dark'
+                      ? 'linear-gradient(135deg, #1e293b, #0f172a)'
+                      : 'linear-gradient(135deg, #f8f6f1, #ede8df)'
+                    : 'transparent',
+                  color: isActive
+                    ? option === 'dark'
+                      ? '#D4AF37'
+                      : '#1a1a2e'
+                    : '#64748b',
+                  boxShadow: isActive
+                    ? option === 'dark'
+                      ? '0 1px 6px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(212,175,55,0.25)'
+                      : '0 1px 6px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(212,175,55,0.3)'
+                    : 'none',
+                }}
+              >
+                {option === 'dark' ? '🌙 Dark' : '☀️ Light'}
+              </button>
+            )
+          })}
+        </div>
+      </div>
 
       {/* Translation */}
       <div style={cardStyle} className="card-hover">

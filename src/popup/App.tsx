@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Dashboard from './Dashboard'
 import Sites from './Sites'
 import Saved from './Saved'
@@ -36,23 +36,40 @@ const tabIcons: Record<Tab, JSX.Element> = {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('Dashboard')
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+
+  useEffect(() => {
+    chrome.storage.local.get(['theme'], (result) => {
+      setTheme(result.theme ?? 'dark')
+    })
+    // Listen for theme changes made in Settings
+    const listener = (changes: Record<string, chrome.storage.StorageChange>) => {
+      if (changes.theme) setTheme(changes.theme.newValue ?? 'dark')
+    }
+    chrome.storage.onChanged.addListener(listener)
+    return () => chrome.storage.onChanged.removeListener(listener)
+  }, [])
+
+  const isLight = theme === 'light'
 
   return (
     <div
-      style={{ width: 400, minHeight: 500, background: '#0a0f1e' }}
-      className="text-white flex flex-col"
+      style={{ width: 400, minHeight: 500, background: isLight ? '#f8f6f1' : '#0a0f1e' }}
+      className={`${isLight ? 'wiqaya-light' : ''} text-white flex flex-col`}
     >
       {/* Header */}
       <div
         style={{
-          background: 'linear-gradient(180deg, #0d1630 0%, #0a0f1e 100%)',
+          background: isLight
+            ? 'linear-gradient(180deg, #ede8df 0%, #f8f6f1 100%)'
+            : 'linear-gradient(180deg, #0d1630 0%, #0a0f1e 100%)',
         }}
         className="px-5 pt-4 pb-3"
       >
         <div className="flex items-baseline gap-2">
           <h1
-            style={{ letterSpacing: '0.04em' }}
-            className="text-xl font-bold text-white"
+            style={{ letterSpacing: '0.04em', color: isLight ? '#1a1a2e' : 'white' }}
+            className="text-xl font-bold"
           >
             Wiqaya
           </h1>
@@ -63,7 +80,7 @@ export default function App() {
             وقاية
           </span>
         </div>
-        <p className="text-xs mt-0.5" style={{ color: '#64748b' }}>
+        <p className="text-xs mt-0.5" style={{ color: isLight ? '#6b6b7b' : '#64748b' }}>
           Your screen time, redeemed.
         </p>
       </div>
@@ -71,7 +88,10 @@ export default function App() {
 
       {/* Tab bar */}
       <div
-        style={{ background: '#0a0f1e', borderBottom: '1px solid rgba(212,175,55,0.1)' }}
+        style={{
+          background: isLight ? '#f8f6f1' : '#0a0f1e',
+          borderBottom: '1px solid rgba(212,175,55,0.1)',
+        }}
         className="flex"
       >
         {tabs.map((tab) => {
@@ -84,14 +104,16 @@ export default function App() {
                 isActive ? 'tab-active' : ''
               }`}
               style={{
-                color: isActive ? '#D4AF37' : '#64748b',
+                color: isActive ? '#D4AF37' : isLight ? '#6b6b7b' : '#64748b',
                 background: isActive ? 'rgba(212,175,55,0.04)' : 'transparent',
               }}
               onMouseEnter={(e) => {
-                if (!isActive) (e.currentTarget as HTMLElement).style.color = '#94a3b8'
+                if (!isActive)
+                  (e.currentTarget as HTMLElement).style.color = isLight ? '#1a1a2e' : '#94a3b8'
               }}
               onMouseLeave={(e) => {
-                if (!isActive) (e.currentTarget as HTMLElement).style.color = '#64748b'
+                if (!isActive)
+                  (e.currentTarget as HTMLElement).style.color = isLight ? '#6b6b7b' : '#64748b'
               }}
             >
               <span className="leading-none">{tabIcons[tab]}</span>
@@ -113,11 +135,11 @@ export default function App() {
       <div
         style={{
           borderTop: '1px solid rgba(212,175,55,0.07)',
-          color: '#334155',
+          color: isLight ? '#9a9aaa' : '#334155',
           fontSize: '10px',
           textAlign: 'center',
           padding: '6px 0',
-          background: '#0a0f1e',
+          background: isLight ? '#f8f6f1' : '#0a0f1e',
         }}
       >
         Wiqaya v1.0.0

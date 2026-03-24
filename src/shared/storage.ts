@@ -16,6 +16,7 @@ const DEFAULTS: WiqayaStorage = {
   contentAccessToken: null,
   contentTokenExpiresAt: null,
   lastTrackedDate: null,
+  theme: 'dark',
 }
 
 export async function getStorage<K extends keyof WiqayaStorage>(

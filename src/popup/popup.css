@@ -236,3 +236,88 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-thumb {
   background: #14b8a6;
 }
+
+/* ─── Light mode overrides ────────────────────────────────────── */
+.wiqaya-light {
+  color: #1a1a2e !important;
+}
+
+/* Scrollbar */
+.wiqaya-light ::-webkit-scrollbar-track {
+  background: #f0ece4;
+}
+.wiqaya-light ::-webkit-scrollbar-thumb {
+  background: #D4AF37;
+}
+
+/* Cards */
+.wiqaya-light .card-hover {
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+.wiqaya-light .card-hover:hover {
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.14);
+}
+
+/* Gold card override: warm light background */
+.wiqaya-light .gold-card {
+  background: linear-gradient(135deg, #ffffff, #f5f0e8);
+  border-color: rgba(212, 175, 55, 0.3);
+}
+
+/* Ticker marks under slider */
+.wiqaya-light .slider-ticks span {
+  color: #9a9aaa;
+}
+.wiqaya-light .slider-ticks .tick-mark::before {
+  background: #c8c0b8;
+}
+
+/* Verse badge */
+.wiqaya-light .verse-badge {
+  background: rgba(212, 175, 55, 0.12);
+  border-color: rgba(212, 175, 55, 0.35);
+  color: #a07e20;
+}
+
+/* Progress bars stay the same, just adjusted shadow */
+.wiqaya-light .progress-bar-teal {
+  background: linear-gradient(90deg, #14b8a6, #10b981);
+}
+
+/* Geometric border decorative text lighter */
+.wiqaya-light .geometric-border::before {
+  color: rgba(212, 175, 55, 0.4);
+}
+
+/* Override Settings card backgrounds */
+.wiqaya-light [style*="background: linear-gradient(135deg, #111827, #0d1424)"],
+.wiqaya-light [style*="background: linear-gradient(135deg, #111827"] {
+  background: linear-gradient(135deg, #ffffff, #f5f0e8) !important;
+  border-color: #e8e0d4 !important;
+}
+
+/* Select dropdown text in light mode */
+.wiqaya-light select {
+  color: #1a1a2e !important;
+  background-color: rgba(0,0,0,0.04) !important;
+  border-color: rgba(26,26,46,0.15) !important;
+}
+
+/* Toggle/switch text */
+.wiqaya-light .text-white {
+  color: #1a1a2e;
+}
+
+/* Secondary labels */
+.wiqaya-light [style*="color: #475569"] {
+  color: #6b6b7b !important;
+}
+.wiqaya-light [style*="color: #64748b"] {
+  color: #6b6b7b !important;
+}
+.wiqaya-light [style*="color: #334155"] {
+  color: #9a9aaa !important;
+}
+.wiqaya-light [style*="color: white"] {
+  color: #1a1a2e !important;
+}

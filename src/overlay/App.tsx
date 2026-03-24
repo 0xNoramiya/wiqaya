@@ -36,11 +36,17 @@ export default function App({ onDismiss }: Props) {
   const [timeElapsed, setTimeElapsed] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [visible, setVisible] = useState(false)
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
 
   useEffect(() => {
     chrome.runtime.sendMessage({ type: 'GET_VERSE' }, (response) => {
       if (response?.data) setVerse(response.data)
       setLoading(false)
+    })
+
+    // Read theme
+    chrome.storage.local.get(['theme'], (result) => {
+      setTheme(result.theme ?? 'dark')
     })
 
     // Start 30s engagement timer
@@ -83,7 +89,7 @@ export default function App({ onDismiss }: Props) {
   }
 
   return (
-    <div className={`wiqaya-overlay${visible ? ' wiqaya-visible' : ''}`}>
+    <div className={`wiqaya-overlay${visible ? ' wiqaya-visible' : ''}${theme === 'light' ? ' wiqaya-light' : ''}`}>
       {/* Blurred dark backdrop */}
       <div className="wiqaya-backdrop" />
 
