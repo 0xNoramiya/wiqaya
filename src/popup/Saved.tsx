@@ -7,6 +7,7 @@ export default function Saved() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
   const [bookmarksLoading, setBookmarksLoading] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
 
   useEffect(() => {
     chrome.runtime.sendMessage({ type: 'GET_AUTH_STATUS' }, (response) => {
@@ -22,7 +23,18 @@ export default function Saved() {
         })
       }
     })
+
+    chrome.storage.local.get(['theme'], (result) => {
+      setTheme(result.theme ?? 'dark')
+    })
+    const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
+      if (changes.theme) setTheme(changes.theme.newValue ?? 'dark')
+    }
+    chrome.storage.onChanged.addListener(listener)
+    return () => chrome.storage.onChanged.removeListener(listener)
   }, [])
+
+  const isLight = theme === 'light'
 
   function deleteBookmark(id: string) {
     setDeletingId(id)
@@ -49,7 +61,7 @@ export default function Saved() {
   if (loading) {
     return (
       <div className="p-4">
-        <p className="text-sm" style={{ color: '#475569' }}>Loading…</p>
+        <p className="text-sm" style={{ color: isLight ? '#8a8a9a' : '#475569' }}>Loading…</p>
       </div>
     )
   }
@@ -67,10 +79,13 @@ export default function Saved() {
           </div>
 
           <div>
-            <h2 className="text-white font-semibold text-base mb-1.5">
+            <h2
+              className="font-semibold text-base mb-1.5"
+              style={{ color: isLight ? '#1a1a2e' : 'white' }}
+            >
               Save Your Favourite Verses
             </h2>
-            <p className="text-sm leading-relaxed" style={{ color: '#64748b' }}>
+            <p className="text-sm leading-relaxed" style={{ color: isLight ? '#6b6b7b' : '#64748b' }}>
               Log in to bookmark verses from the overlay and revisit them
               anytime — your personal Quran collection.
             </p>
@@ -101,21 +116,21 @@ export default function Saved() {
       <div className="gold-card card-hover p-4">
         <h2
           className="text-xs font-semibold uppercase tracking-widest mb-3"
-          style={{ color: '#64748b' }}
+          style={{ color: isLight ? '#6b6b7b' : '#64748b' }}
         >
           Saved Verses
         </h2>
 
         {bookmarksLoading ? (
-          <p className="text-sm" style={{ color: '#475569' }}>Loading bookmarks…</p>
+          <p className="text-sm" style={{ color: isLight ? '#8a8a9a' : '#475569' }}>Loading bookmarks…</p>
         ) : bookmarks.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-4 text-center">
             <div className="book-icon" />
             <div>
-              <p className="text-sm font-medium" style={{ color: '#94a3b8' }}>
+              <p className="text-sm font-medium" style={{ color: isLight ? '#4a4a5a' : '#94a3b8' }}>
                 No saved verses yet
               </p>
-              <p className="text-xs mt-1 leading-relaxed max-w-[220px]" style={{ color: '#475569' }}>
+              <p className="text-xs mt-1 leading-relaxed max-w-[220px]" style={{ color: isLight ? '#8a8a9a' : '#475569' }}>
                 Tap the bookmark icon on the overlay to save verses here.
               </p>
             </div>
@@ -148,7 +163,7 @@ export default function Saved() {
                   <div className="flex items-center gap-2.5">
                     {/* Gold verse badge */}
                     <span className="verse-badge">{verseKey}</span>
-                    <span className="text-xs" style={{ color: '#475569' }}>
+                    <span className="text-xs" style={{ color: isLight ? '#8a8a9a' : '#475569' }}>
                       {formatDate(bookmark.createdAt)}
                     </span>
                   </div>
@@ -156,13 +171,13 @@ export default function Saved() {
                     onClick={() => deleteBookmark(bookmark.id)}
                     disabled={deletingId === bookmark.id}
                     className="transition-colors ml-2 text-lg leading-none rounded-full w-6 h-6 flex items-center justify-center disabled:opacity-40"
-                    style={{ color: '#475569' }}
+                    style={{ color: isLight ? '#8a8a9a' : '#475569' }}
                     onMouseEnter={(e) => {
                       if (deletingId !== bookmark.id)
                         (e.currentTarget as HTMLElement).style.color = '#f87171'
                     }}
                     onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.color = '#475569'
+                      (e.currentTarget as HTMLElement).style.color = isLight ? '#8a8a9a' : '#475569'
                     }}
                     title="Delete bookmark"
                   >

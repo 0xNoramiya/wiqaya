@@ -31,12 +31,24 @@ export default function Sites() {
   const [domainInput, setDomainInput] = useState('')
   const [limitInput, setLimitInput] = useState('15')
   const [error, setError] = useState('')
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
 
   useEffect(() => {
     chrome.storage.local.get(['trackedSites'], (result) => {
       setSites(result.trackedSites ?? [])
     })
+
+    chrome.storage.local.get(['theme'], (result) => {
+      setTheme(result.theme ?? 'dark')
+    })
+    const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
+      if (changes.theme) setTheme(changes.theme.newValue ?? 'dark')
+    }
+    chrome.storage.onChanged.addListener(listener)
+    return () => chrome.storage.onChanged.removeListener(listener)
   }, [])
+
+  const isLight = theme === 'light'
 
   function saveSites(updated: TrackedSite[]) {
     setSites(updated)
@@ -78,6 +90,9 @@ export default function Sites() {
     saveSites([...sites, { domain, timeLimitMinutes: 15 }])
   }
 
+  const inputBg = isLight ? '#f5f0e8' : 'rgba(255,255,255,0.05)'
+  const inputBorder = isLight ? '#d8d0c4' : 'rgba(255,255,255,0.1)'
+
   return (
     <div className="p-4 flex flex-col gap-3">
 
@@ -85,7 +100,7 @@ export default function Sites() {
       <div className="gold-card card-hover p-4">
         <h2
           className="text-xs font-semibold uppercase tracking-widest mb-3"
-          style={{ color: '#64748b' }}
+          style={{ color: isLight ? '#6b6b7b' : '#64748b' }}
         >
           Watch List
         </h2>
@@ -101,10 +116,10 @@ export default function Sites() {
             >
               ◈
             </div>
-            <p className="text-sm" style={{ color: '#475569' }}>
+            <p className="text-sm" style={{ color: isLight ? '#8a8a9a' : '#475569' }}>
               No sites added yet.
             </p>
-            <p className="text-xs" style={{ color: '#334155' }}>
+            <p className="text-xs" style={{ color: isLight ? '#9a9aaa' : '#334155' }}>
               Add a site below to start tracking your time.
             </p>
           </div>
@@ -113,19 +128,22 @@ export default function Sites() {
             {sites.map((site) => {
               const color = domainColor(site.domain)
               const initial = site.domain[0].toUpperCase()
+              const listBg = isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)'
+              const listBorder = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'
+              const listBgHover = isLight ? 'rgba(0,0,0,0.055)' : 'rgba(255,255,255,0.055)'
               return (
                 <li
                   key={site.domain}
                   className="flex items-center justify-between rounded-lg px-3 py-2.5 transition-all duration-200"
                   style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    background: listBg,
+                    border: `1px solid ${listBorder}`,
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.055)'
+                    (e.currentTarget as HTMLElement).style.background = listBgHover
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'
+                    (e.currentTarget as HTMLElement).style.background = listBg
                   }}
                 >
                   <div className="flex items-center gap-2.5">
@@ -143,12 +161,15 @@ export default function Sites() {
                       {initial}
                     </div>
                     <div>
-                      <span className="text-sm text-white font-medium">
+                      <span
+                        className="text-sm font-medium"
+                        style={{ color: isLight ? '#1a1a2e' : 'white' }}
+                      >
                         {site.domain}
                       </span>
                       <span
                         className="text-xs ml-2"
-                        style={{ color: '#475569' }}
+                        style={{ color: isLight ? '#8a8a9a' : '#475569' }}
                       >
                         {site.timeLimitMinutes}m limit
                       </span>
@@ -157,12 +178,12 @@ export default function Sites() {
                   <button
                     onClick={() => removeSite(site.domain)}
                     className="transition-colors ml-2 text-lg leading-none rounded-full w-6 h-6 flex items-center justify-center"
-                    style={{ color: '#475569' }}
+                    style={{ color: isLight ? '#8a8a9a' : '#475569' }}
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLElement).style.color = '#f87171'
                     }}
                     onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.color = '#475569'
+                      (e.currentTarget as HTMLElement).style.color = isLight ? '#8a8a9a' : '#475569'
                     }}
                     title="Remove site"
                   >
@@ -179,7 +200,7 @@ export default function Sites() {
       <div className="gold-card card-hover p-4">
         <h2
           className="text-xs font-semibold uppercase tracking-widest mb-3"
-          style={{ color: '#64748b' }}
+          style={{ color: isLight ? '#6b6b7b' : '#64748b' }}
         >
           Quick Add
         </h2>
@@ -195,8 +216,8 @@ export default function Sites() {
                 style={
                   already
                     ? {
-                        border: '1px solid rgba(255,255,255,0.07)',
-                        color: '#334155',
+                        border: isLight ? '1px solid #e0d8cc' : '1px solid rgba(255,255,255,0.07)',
+                        color: isLight ? '#9a9aaa' : '#334155',
                         cursor: 'not-allowed',
                       }
                     : {
@@ -227,7 +248,7 @@ export default function Sites() {
       <div className="gold-card card-hover p-4">
         <h2
           className="text-xs font-semibold uppercase tracking-widest mb-3"
-          style={{ color: '#64748b' }}
+          style={{ color: isLight ? '#6b6b7b' : '#64748b' }}
         >
           Add Site
         </h2>
@@ -241,17 +262,18 @@ export default function Sites() {
                 setError('')
               }}
               placeholder="example.com"
-              className="flex-1 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none"
+              className="flex-1 rounded-lg px-3 py-2 text-sm focus:outline-none"
               style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                background: inputBg,
+                border: `1px solid ${inputBorder}`,
+                color: isLight ? '#1a1a2e' : 'white',
                 transition: 'border-color 200ms ease',
               }}
               onFocus={(e) => {
                 (e.target as HTMLElement).style.borderColor = 'rgba(20,184,166,0.5)'
               }}
               onBlur={(e) => {
-                (e.target as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'
+                (e.target as HTMLElement).style.borderColor = inputBorder
               }}
             />
             <input
@@ -261,17 +283,18 @@ export default function Sites() {
               min={1}
               max={180}
               placeholder="min"
-              className="w-16 rounded-lg px-2 py-2 text-sm text-white text-center focus:outline-none"
+              className="w-16 rounded-lg px-2 py-2 text-sm text-center focus:outline-none"
               style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                background: inputBg,
+                border: `1px solid ${inputBorder}`,
+                color: isLight ? '#1a1a2e' : 'white',
                 transition: 'border-color 200ms ease',
               }}
               onFocus={(e) => {
                 (e.target as HTMLElement).style.borderColor = 'rgba(20,184,166,0.5)'
               }}
               onBlur={(e) => {
-                (e.target as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'
+                (e.target as HTMLElement).style.borderColor = inputBorder
               }}
             />
             <button

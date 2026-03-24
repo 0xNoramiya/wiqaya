@@ -43,6 +43,7 @@ export default function Dashboard() {
   const [streak, setStreak] = useState<StreakData | null>(null)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [loadingStreak, setLoadingStreak] = useState(true)
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
 
   useEffect(() => {
     chrome.storage.local.get(
@@ -70,7 +71,18 @@ export default function Dashboard() {
         setLoadingStreak(false)
       }
     })
+
+    chrome.storage.local.get(['theme'], (result) => {
+      setTheme(result.theme ?? 'dark')
+    })
+    const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
+      if (changes.theme) setTheme(changes.theme.newValue ?? 'dark')
+    }
+    chrome.storage.onChanged.addListener(listener)
+    return () => chrome.storage.onChanged.removeListener(listener)
   }, [])
+
+  const isLight = theme === 'light'
 
   const today = new Date().toISOString().split('T')[0]
   const todayEntries = Object.values(data.siteTimeEntries).filter(
@@ -84,7 +96,7 @@ export default function Dashboard() {
       <div className="gold-card card-hover p-4">
         <h2
           className="text-xs font-semibold uppercase tracking-widest mb-3"
-          style={{ color: '#64748b' }}
+          style={{ color: isLight ? '#6b6b7b' : '#64748b' }}
         >
           Verses Read
         </h2>
@@ -97,7 +109,7 @@ export default function Dashboard() {
             >
               {data.versesReadToday}
             </span>
-            <span className="text-xs mt-1" style={{ color: '#64748b' }}>Today</span>
+            <span className="text-xs mt-1" style={{ color: isLight ? '#6b6b7b' : '#64748b' }}>Today</span>
           </div>
 
           {/* Divider diamond */}
@@ -112,7 +124,7 @@ export default function Dashboard() {
             <span className="text-4xl font-bold" style={{ color: '#14b8a6' }}>
               {data.totalVersesRead}
             </span>
-            <span className="text-xs mt-1" style={{ color: '#64748b' }}>All Time</span>
+            <span className="text-xs mt-1" style={{ color: isLight ? '#6b6b7b' : '#64748b' }}>All Time</span>
           </div>
         </div>
       </div>
@@ -121,14 +133,14 @@ export default function Dashboard() {
       <div className="gold-card card-hover p-4">
         <h2
           className="text-xs font-semibold uppercase tracking-widest mb-3"
-          style={{ color: '#64748b' }}
+          style={{ color: isLight ? '#6b6b7b' : '#64748b' }}
         >
           Time Tracked Today
         </h2>
         {todayEntries.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-3 text-center">
             <span style={{ fontSize: 28, opacity: 0.3 }}>◎</span>
-            <p className="text-sm" style={{ color: '#475569' }}>
+            <p className="text-sm" style={{ color: isLight ? '#8a8a9a' : '#475569' }}>
               No tracked time yet today.
             </p>
           </div>
@@ -153,16 +165,19 @@ export default function Dashboard() {
                         className="favicon-dot"
                         style={{ background: color }}
                       />
-                      <span className="text-sm text-white font-medium">
+                      <span
+                        className="text-sm font-medium"
+                        style={{ color: isLight ? '#1a1a2e' : 'white' }}
+                      >
                         {entry.domain}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-xs font-medium" style={{ color: '#94a3b8' }}>
+                      <span className="text-xs font-medium" style={{ color: isLight ? '#4a4a5a' : '#94a3b8' }}>
                         {formatTime(entry.timeSpentMs)}
                       </span>
                       {remaining !== null && (
-                        <span className="text-xs ml-1" style={{ color: '#475569' }}>
+                        <span className="text-xs ml-1" style={{ color: isLight ? '#8a8a9a' : '#475569' }}>
                           · {formatTime(remaining)} left
                         </span>
                       )}
@@ -171,7 +186,7 @@ export default function Dashboard() {
                   {limitMs > 0 && (
                     <div
                       className="h-1.5 rounded-full overflow-hidden"
-                      style={{ background: 'rgba(255,255,255,0.06)' }}
+                      style={{ background: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)' }}
                     >
                       <div
                         className={`h-full rounded-full transition-all ${
@@ -196,7 +211,7 @@ export default function Dashboard() {
       <div className="gold-card card-hover p-4">
         <h2
           className="text-xs font-semibold uppercase tracking-widest mb-3"
-          style={{ color: '#64748b' }}
+          style={{ color: isLight ? '#6b6b7b' : '#64748b' }}
         >
           Current Streak
         </h2>
@@ -204,16 +219,16 @@ export default function Dashboard() {
           <div className="flex flex-col items-center gap-3 py-2 text-center">
             <div className="lock-icon" />
             <div>
-              <p className="text-sm font-medium" style={{ color: '#94a3b8' }}>
+              <p className="text-sm font-medium" style={{ color: isLight ? '#4a4a5a' : '#94a3b8' }}>
                 Streak tracking locked
               </p>
-              <p className="text-xs mt-0.5" style={{ color: '#475569' }}>
+              <p className="text-xs mt-0.5" style={{ color: isLight ? '#8a8a9a' : '#475569' }}>
                 Log in to track your daily streak
               </p>
             </div>
           </div>
         ) : loadingStreak ? (
-          <p className="text-sm" style={{ color: '#475569' }}>Loading…</p>
+          <p className="text-sm" style={{ color: isLight ? '#8a8a9a' : '#475569' }}>Loading…</p>
         ) : streak ? (
           <div className="flex items-center gap-3">
             <span className="text-3xl flame-flicker">🔥</span>
@@ -224,11 +239,11 @@ export default function Dashboard() {
               >
                 {streak.days ?? 0}
               </span>
-              <span className="text-sm ml-1" style={{ color: '#64748b' }}>days</span>
+              <span className="text-sm ml-1" style={{ color: isLight ? '#6b6b7b' : '#64748b' }}>days</span>
             </div>
           </div>
         ) : (
-          <p className="text-sm" style={{ color: '#475569' }}>Streak data unavailable.</p>
+          <p className="text-sm" style={{ color: isLight ? '#8a8a9a' : '#475569' }}>Streak data unavailable.</p>
         )}
       </div>
     </div>
