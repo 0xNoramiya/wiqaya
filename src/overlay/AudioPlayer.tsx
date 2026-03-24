@@ -12,6 +12,24 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
+// Extracts a human-readable reciter name from the audio URL path
+function extractReciter(url: string): string {
+  try {
+    const parts = new URL(url).pathname.split('/')
+    // evesalabs / hafs / mishari etc. — pick the first meaningful segment
+    const candidate = parts.find(
+      (p) => p.length > 3 && !/^\d/.test(p) && p !== 'audio' && p !== 'ayah',
+    )
+    if (!candidate) return 'Recitation'
+    // Convert snake_case or kebab-case to Title Case
+    return candidate
+      .replace(/[-_]/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+  } catch {
+    return 'Recitation'
+  }
+}
+
 export default function AudioPlayer({ audioUrl, onPlay }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -28,9 +46,7 @@ export default function AudioPlayer({ audioUrl, onPlay }: Props) {
     audio.preload = 'metadata'
     audioRef.current = audio
 
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration)
-    }
+    const handleLoadedMetadata = () => setDuration(audio.duration)
     const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime)
       if (audio.duration > 0) {
@@ -41,9 +57,7 @@ export default function AudioPlayer({ audioUrl, onPlay }: Props) {
       setIsPlaying(false)
       setProgress(100)
     }
-    const handleCanPlay = () => {
-      setIsLoading(false)
-    }
+    const handleCanPlay = () => setIsLoading(false)
 
     audio.addEventListener('loadedmetadata', handleLoadedMetadata)
     audio.addEventListener('timeupdate', handleTimeUpdate)
@@ -83,52 +97,77 @@ export default function AudioPlayer({ audioUrl, onPlay }: Props) {
 
   if (!audioUrl) return null
 
+  const reciterName = extractReciter(audioUrl)
+
   return (
     <div className="wiqaya-audio-player">
-      {/* Play/Pause button */}
-      <button
-        className="wiqaya-audio-play-btn"
-        onClick={handleTogglePlay}
-        disabled={isLoading}
-        aria-label={isPlaying ? 'Pause recitation' : 'Play recitation'}
-      >
-        {isLoading ? (
-          <span style={{ fontSize: '0.65rem', opacity: 0.7 }}>◌</span>
-        ) : isPlaying ? (
-          /* Pause icon */
-          <span style={{ display: 'flex', gap: '3px', alignItems: 'center' }}>
-            <span style={{ width: '3px', height: '12px', background: 'currentColor', borderRadius: '1px' }} />
-            <span style={{ width: '3px', height: '12px', background: 'currentColor', borderRadius: '1px' }} />
-          </span>
-        ) : (
-          /* Play triangle */
-          <span style={{
-            width: 0,
-            height: 0,
-            borderStyle: 'solid',
-            borderWidth: '6px 0 6px 10px',
-            borderColor: 'transparent transparent transparent currentColor',
-            marginLeft: '2px',
-            display: 'block',
-          }} />
-        )}
-      </button>
+      {/* Top row: play button | reciter info | waveform | time */}
+      <div className="wiqaya-audio-top-row">
+        {/* Play / Pause button */}
+        <button
+          className={`wiqaya-audio-play-btn${isPlaying ? ' wiqaya-playing' : ''}`}
+          onClick={handleTogglePlay}
+          disabled={isLoading}
+          aria-label={isPlaying ? 'Pause recitation' : 'Play recitation'}
+        >
+          {isLoading ? (
+            /* Loading spinner dots */
+            <span style={{ fontSize: '0.6rem', opacity: 0.7, letterSpacing: '2px' }}>•••</span>
+          ) : isPlaying ? (
+            /* Pause icon */
+            <span style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+              <span style={{ width: '3px', height: '13px', background: 'currentColor', borderRadius: '2px' }} />
+              <span style={{ width: '3px', height: '13px', background: 'currentColor', borderRadius: '2px' }} />
+            </span>
+          ) : (
+            /* Play triangle */
+            <span style={{
+              width: 0,
+              height: 0,
+              borderStyle: 'solid',
+              borderWidth: '7px 0 7px 12px',
+              borderColor: 'transparent transparent transparent currentColor',
+              marginLeft: '3px',
+              display: 'block',
+            }} />
+          )}
+        </button>
 
-      {/* Progress bar */}
-      <div className="wiqaya-audio-progress">
-        <div
-          className="wiqaya-audio-progress-fill"
-          style={{ width: `${progress}%` }}
-        />
+        {/* Reciter info */}
+        <div className="wiqaya-audio-info">
+          <span className="wiqaya-audio-label">Recitation</span>
+          <span className="wiqaya-audio-reciter">{reciterName}</span>
+        </div>
+
+        {/* Waveform equalizer */}
+        <div className={`wiqaya-waveform${isPlaying ? ' wiqaya-wave-playing' : ''}`}>
+          <div className="wiqaya-wave-bar" />
+          <div className="wiqaya-wave-bar" />
+          <div className="wiqaya-wave-bar" />
+          <div className="wiqaya-wave-bar" />
+          <div className="wiqaya-wave-bar" />
+          <div className="wiqaya-wave-bar" />
+          <div className="wiqaya-wave-bar" />
+        </div>
+
+        {/* Time display */}
+        <span className="wiqaya-audio-time">
+          {duration > 0
+            ? `${formatTime(currentTime)} / ${formatTime(duration)}`
+            : isPlaying ? formatTime(currentTime) : '--:--'
+          }
+        </span>
       </div>
 
-      {/* Time */}
-      <span className="wiqaya-audio-time">
-        {duration > 0
-          ? `${formatTime(currentTime)} / ${formatTime(duration)}`
-          : isPlaying ? formatTime(currentTime) : 'Recitation'
-        }
-      </span>
+      {/* Bottom row: progress bar */}
+      <div className="wiqaya-audio-bottom-row">
+        <div className="wiqaya-audio-progress">
+          <div
+            className="wiqaya-audio-progress-fill"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
     </div>
   )
 }

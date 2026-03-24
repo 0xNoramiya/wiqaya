@@ -10,7 +10,10 @@ interface Props {
 function LoadingSpinner() {
   return (
     <div className="wiqaya-loading">
-      <div className="wiqaya-spinner" />
+      <div style={{ position: 'relative', width: '3rem', height: '3rem' }}>
+        <div className="wiqaya-spinner" />
+        <div className="wiqaya-spinner-ring" />
+      </div>
       <p className="wiqaya-loading-text">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
     </div>
   )
@@ -84,6 +87,22 @@ export default function App({ onDismiss }: Props) {
       {/* Blurred dark backdrop */}
       <div className="wiqaya-backdrop" />
 
+      {/* Central radial glow */}
+      <div className="wiqaya-backdrop-glow" />
+
+      {/* Floating gold particles */}
+      <div className="wiqaya-particles" aria-hidden="true">
+        <div className="wiqaya-particle" />
+        <div className="wiqaya-particle" />
+        <div className="wiqaya-particle" />
+        <div className="wiqaya-particle" />
+        <div className="wiqaya-particle" />
+        <div className="wiqaya-particle" />
+        <div className="wiqaya-particle" />
+        <div className="wiqaya-particle" />
+        <div className="wiqaya-particle" />
+      </div>
+
       {/* Centered content */}
       <div className="wiqaya-content">
         {loading ? (
@@ -106,6 +125,7 @@ export default function App({ onDismiss }: Props) {
             {isEngaged && (
               <button onClick={handleContinue} className="wiqaya-continue-btn">
                 Continue Browsing
+                <span className="wiqaya-continue-btn-arrow">→</span>
               </button>
             )}
           </>
