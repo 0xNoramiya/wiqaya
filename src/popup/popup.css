@@ -246,11 +246,65 @@ input[type="range"]::-webkit-slider-thumb {
 .wiqaya-light ::-webkit-scrollbar-track {
   background: #f0ece4;
 }
-.wiqaya-light ::-webkit-scrollbar-thumb {
-  background: #D4AF37;
+
+/* All slate-800/900 backgrounds → warm white */
+.wiqaya-light .bg-slate-900 {
+  background-color: #f8f6f1 !important;
+}
+.wiqaya-light .bg-slate-800 {
+  background-color: #ffffff !important;
+}
+.wiqaya-light .bg-slate-700 {
+  background-color: #f0ece4 !important;
+}
+.wiqaya-light .bg-slate-700\/50 {
+  background-color: rgba(240, 236, 228, 0.6) !important;
 }
 
-/* Cards */
+/* Borders → warm gray */
+.wiqaya-light .border-slate-700 {
+  border-color: #e8e0d4 !important;
+}
+.wiqaya-light .border-slate-600 {
+  border-color: #d8d0c4 !important;
+}
+
+/* Text color overrides */
+.wiqaya-light .text-white {
+  color: #1a1a2e !important;
+}
+.wiqaya-light .text-slate-300 {
+  color: #4a4a5a !important;
+}
+.wiqaya-light .text-slate-400 {
+  color: #6b6b7b !important;
+}
+.wiqaya-light .text-slate-500 {
+  color: #8a8a9a !important;
+}
+.wiqaya-light .text-slate-600 {
+  color: #9a9aaa !important;
+}
+
+/* Input fields */
+.wiqaya-light input[type="text"],
+.wiqaya-light input[type="number"],
+.wiqaya-light select {
+  color: #1a1a2e !important;
+  background-color: #f5f0e8 !important;
+  border-color: #d8d0c4 !important;
+}
+.wiqaya-light input::placeholder {
+  color: #9a9aaa !important;
+}
+
+/* Gold card override */
+.wiqaya-light .gold-card {
+  background: linear-gradient(135deg, #ffffff, #f5f0e8) !important;
+  border-color: rgba(212, 175, 55, 0.3) !important;
+}
+
+/* Cards hover */
 .wiqaya-light .card-hover {
   box-shadow: 0 1px 6px rgba(0,0,0,0.06);
 }
@@ -258,13 +312,7 @@ input[type="range"]::-webkit-slider-thumb {
   box-shadow: 0 4px 20px rgba(212, 175, 55, 0.14);
 }
 
-/* Gold card override: warm light background */
-.wiqaya-light .gold-card {
-  background: linear-gradient(135deg, #ffffff, #f5f0e8);
-  border-color: rgba(212, 175, 55, 0.3);
-}
-
-/* Ticker marks under slider */
+/* Tick marks */
 .wiqaya-light .slider-ticks span {
   color: #9a9aaa;
 }
@@ -274,50 +322,32 @@ input[type="range"]::-webkit-slider-thumb {
 
 /* Verse badge */
 .wiqaya-light .verse-badge {
-  background: rgba(212, 175, 55, 0.12);
-  border-color: rgba(212, 175, 55, 0.35);
+  background: rgba(212, 175, 55, 0.1);
   color: #a07e20;
 }
 
-/* Progress bars stay the same, just adjusted shadow */
-.wiqaya-light .progress-bar-teal {
-  background: linear-gradient(90deg, #14b8a6, #10b981);
-}
-
-/* Geometric border decorative text lighter */
+/* Geometric border */
 .wiqaya-light .geometric-border::before {
   color: rgba(212, 175, 55, 0.4);
 }
 
-/* Override Settings card backgrounds */
-.wiqaya-light [style*="background: linear-gradient(135deg, #111827, #0d1424)"],
-.wiqaya-light [style*="background: linear-gradient(135deg, #111827"] {
-  background: linear-gradient(135deg, #ffffff, #f5f0e8) !important;
-  border-color: #e8e0d4 !important;
+/* Dividers */
+.wiqaya-light .bg-slate-700.w-px,
+.wiqaya-light .w-px.bg-slate-700 {
+  background-color: #e0d8cc !important;
 }
 
-/* Select dropdown text in light mode */
-.wiqaya-light select {
-  color: #1a1a2e !important;
-  background-color: rgba(0,0,0,0.04) !important;
-  border-color: rgba(26,26,46,0.15) !important;
-}
-
-/* Toggle/switch text */
-.wiqaya-light .text-white {
-  color: #1a1a2e;
-}
-
-/* Secondary labels */
-.wiqaya-light [style*="color: #475569"] {
-  color: #6b6b7b !important;
-}
-.wiqaya-light [style*="color: #64748b"] {
-  color: #6b6b7b !important;
-}
-.wiqaya-light [style*="color: #334155"] {
+/* Disabled buttons */
+.wiqaya-light .bg-slate-700:disabled,
+.wiqaya-light button:disabled.bg-slate-700 {
+  background-color: #e8e0d4 !important;
   color: #9a9aaa !important;
 }
-.wiqaya-light [style*="color: white"] {
-  color: #1a1a2e !important;
+
+/* Progress bar background */
+.wiqaya-light .bg-slate-700.rounded-full {
+  background-color: #e8e0d4 !important;
 }
+
+/* Header gold line stays */
+/* Lock/book icons stay gold — fine on both themes */
