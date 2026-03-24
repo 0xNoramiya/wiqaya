@@ -190,14 +190,14 @@ export default function Settings() {
         ) : (
           <div className="flex flex-col gap-2">
             <p className="text-slate-400 text-sm">
-              Log in with your Quran.com account to track streaks and save
-              verses.
+              Quran.com login for streaks and bookmarks — coming soon.
+              Pending production scope approval.
             </p>
             <button
-              onClick={handleLogin}
-              className="bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium rounded-lg py-2 transition-colors"
+              disabled
+              className="bg-slate-700 text-slate-500 text-sm font-medium rounded-lg py-2 cursor-not-allowed"
             >
-              Log in with Quran.com
+              Log in with Quran.com (coming soon)
             </button>
           </div>
         )}
