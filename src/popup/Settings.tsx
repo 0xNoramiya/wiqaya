@@ -10,17 +10,34 @@ const TRANSLATIONS = [
 ]
 
 const RECITERS = [
-  { id: 7, label: '7 — Mishary Rashid Alafasy' },
-  { id: 1, label: '1 — Abdul Basit (Murattal)' },
-  { id: 2, label: '2 — Abdul Basit (Mujawwad)' },
-  { id: 3, label: '3 — Abdur-Rahman as-Sudais' },
-  { id: 4, label: '4 — Abu Bakr al-Shatri' },
+  { id: 7, label: 'Mishary Rashid Alafasy' },
+  { id: 1, label: 'Abdul Basit (Murattal)' },
+  { id: 2, label: 'Abdul Basit (Mujawwad)' },
+  { id: 3, label: 'Abdur-Rahman as-Sudais' },
+  { id: 4, label: 'Abu Bakr al-Shatri' },
 ]
 
 type SettingsState = Pick<
   WiqayaStorage,
   'translationId' | 'recitationId' | 'autoPlayAudio' | 'globalTimeLimitMinutes'
 >
+
+const cardStyle: React.CSSProperties = {
+  background: 'linear-gradient(135deg, #111827, #0d1424)',
+  border: '1px solid rgba(212,175,55,0.15)',
+  borderRadius: '0.75rem',
+  padding: '1rem',
+}
+
+const labelStyle: React.CSSProperties = {
+  display: 'block',
+  fontSize: '10px',
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '0.1em',
+  color: '#64748b',
+  marginBottom: '8px',
+}
 
 export default function Settings() {
   const [settings, setSettings] = useState<SettingsState>({
@@ -74,20 +91,43 @@ export default function Settings() {
     chrome.runtime.sendMessage({ type: 'START_LOGIN' })
   }
 
+  const selectStyle: React.CSSProperties = {
+    width: '100%',
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '0.5rem',
+    padding: '8px 36px 8px 12px',
+    fontSize: '13px',
+    color: 'white',
+    cursor: 'pointer',
+    appearance: 'none',
+    WebkitAppearance: 'none',
+    backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23D4AF37' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")",
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 12px center',
+    outline: 'none',
+    transition: 'border-color 200ms ease',
+  }
+
   return (
-    <div className="p-4 flex flex-col gap-4">
+    <div className="p-4 flex flex-col gap-3">
+
       {/* Translation */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
-        <label className="block text-sm font-semibold text-slate-300 mb-2 uppercase tracking-wider">
-          Translation
-        </label>
+      <div style={cardStyle} className="card-hover">
+        <label style={labelStyle}>Translation</label>
         <select
           value={settings.translationId}
           onChange={(e) => update('translationId', Number(e.target.value))}
-          className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500 cursor-pointer"
+          style={selectStyle}
+          onFocus={(e) => {
+            (e.target as HTMLElement).style.borderColor = 'rgba(20,184,166,0.5)'
+          }}
+          onBlur={(e) => {
+            (e.target as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'
+          }}
         >
           {TRANSLATIONS.map((t) => (
-            <option key={t.id} value={t.id}>
+            <option key={t.id} value={t.id} style={{ background: '#111827', color: 'white' }}>
               {t.label}
             </option>
           ))}
@@ -95,17 +135,21 @@ export default function Settings() {
       </div>
 
       {/* Reciter */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
-        <label className="block text-sm font-semibold text-slate-300 mb-2 uppercase tracking-wider">
-          Reciter
-        </label>
+      <div style={cardStyle} className="card-hover">
+        <label style={labelStyle}>Reciter</label>
         <select
           value={settings.recitationId}
           onChange={(e) => update('recitationId', Number(e.target.value))}
-          className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500 cursor-pointer"
+          style={selectStyle}
+          onFocus={(e) => {
+            (e.target as HTMLElement).style.borderColor = 'rgba(20,184,166,0.5)'
+          }}
+          onBlur={(e) => {
+            (e.target as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'
+          }}
         >
           {RECITERS.map((r) => (
-            <option key={r.id} value={r.id}>
+            <option key={r.id} value={r.id} style={{ background: '#111827', color: 'white' }}>
               {r.label}
             </option>
           ))}
@@ -113,41 +157,56 @@ export default function Settings() {
       </div>
 
       {/* Auto-play audio */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+      <div style={cardStyle} className="card-hover">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-slate-300 uppercase tracking-wider">
-              Auto-play Audio
-            </p>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p style={labelStyle as React.CSSProperties}>Auto-play Audio</p>
+            <p className="text-xs" style={{ color: '#475569' }}>
               Play recitation automatically on overlay
             </p>
           </div>
-          <button
-            role="switch"
-            aria-checked={settings.autoPlayAudio}
-            onClick={() => update('autoPlayAudio', !settings.autoPlayAudio)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-              settings.autoPlayAudio ? 'bg-teal-500' : 'bg-slate-600'
-            }`}
-          >
+          <div className="flex items-center gap-2">
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                settings.autoPlayAudio ? 'translate-x-6' : 'translate-x-1'
-              }`}
-            />
-          </button>
+              className="text-xs transition-all duration-200"
+              style={{ color: settings.autoPlayAudio ? '#D4AF37' : '#334155' }}
+            >
+              {settings.autoPlayAudio ? 'ON' : 'OFF'}
+            </span>
+            <button
+              role="switch"
+              aria-checked={settings.autoPlayAudio}
+              onClick={() => update('autoPlayAudio', !settings.autoPlayAudio)}
+              className="relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-200 focus:outline-none"
+              style={{
+                background: settings.autoPlayAudio
+                  ? 'linear-gradient(135deg, #14b8a6, #0d9488)'
+                  : 'rgba(255,255,255,0.1)',
+              }}
+            >
+              <span
+                className="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200"
+                style={{
+                  transform: settings.autoPlayAudio ? 'translateX(24px)' : 'translateX(4px)',
+                }}
+              />
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Global Time Limit */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+      <div style={cardStyle} className="card-hover">
         <div className="flex items-center justify-between mb-2">
-          <label className="text-sm font-semibold text-slate-300 uppercase tracking-wider">
+          <label style={labelStyle as React.CSSProperties}>
             Global Time Limit
           </label>
-          <span className="text-teal-400 text-sm font-medium">
-            {settings.globalTimeLimitMinutes < 1 ? `${Math.round(settings.globalTimeLimitMinutes * 60)}s` : `${settings.globalTimeLimitMinutes} min`}
+          <span
+            className="text-sm font-semibold"
+            style={{ color: '#14b8a6' }}
+          >
+            {settings.globalTimeLimitMinutes < 1
+              ? `${Math.round(settings.globalTimeLimitMinutes * 60)}s`
+              : `${settings.globalTimeLimitMinutes} min`}
           </span>
         </div>
         <input
@@ -159,43 +218,78 @@ export default function Settings() {
           onChange={(e) =>
             update('globalTimeLimitMinutes', Number(e.target.value))
           }
-          className="w-full accent-teal-500 cursor-pointer"
+          className="w-full cursor-pointer"
+          style={{ accentColor: '#14b8a6' }}
         />
-        <div className="flex justify-between text-xs text-slate-500 mt-1">
-          <span>6s</span>
-          <span>60m</span>
+        {/* Tick marks */}
+        <div className="slider-ticks">
+          {[
+            { label: '6s', pos: ((0.1 - 0.1) / (60 - 0.1)) * 100 },
+            { label: '5m', pos: ((5 - 0.1) / (60 - 0.1)) * 100 },
+            { label: '15m', pos: ((15 - 0.1) / (60 - 0.1)) * 100 },
+            { label: '30m', pos: ((30 - 0.1) / (60 - 0.1)) * 100 },
+            { label: '60m', pos: ((60 - 0.1) / (60 - 0.1)) * 100 },
+          ].map(({ label }) => (
+            <div key={label} className="tick-mark">
+              <span>{label}</span>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Account */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
-        <h2 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wider">
-          Account
-        </h2>
+      <div
+        style={{
+          ...cardStyle,
+          borderColor: 'rgba(212,175,55,0.2)',
+        }}
+        className="card-hover geometric-border"
+      >
+        <h2 style={{ ...labelStyle as React.CSSProperties, marginBottom: 12 }}>Account</h2>
         {authLoading ? (
-          <p className="text-slate-500 text-sm">Loading…</p>
+          <p className="text-sm" style={{ color: '#475569' }}>Loading…</p>
         ) : isLoggedIn ? (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-teal-400 text-sm">●</span>
+              <span
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ background: '#14b8a6', boxShadow: '0 0 6px rgba(20,184,166,0.5)' }}
+              />
               <span className="text-sm text-white">Logged in</span>
             </div>
             <button
               onClick={handleLogout}
-              className="text-sm text-red-400 hover:text-red-300 border border-red-800 hover:border-red-600 rounded-lg px-3 py-1.5 transition-colors"
+              className="text-sm rounded-lg px-3 py-1.5 transition-all duration-200"
+              style={{
+                color: '#f87171',
+                border: '1px solid rgba(239,68,68,0.3)',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(239,68,68,0.6)'
+                ;(e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.08)'
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(239,68,68,0.3)'
+                ;(e.currentTarget as HTMLElement).style.background = 'transparent'
+              }}
             >
               Log out
             </button>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            <p className="text-slate-400 text-sm">
+            <p className="text-sm leading-relaxed" style={{ color: '#64748b' }}>
               Quran.com login for streaks and bookmarks — coming soon.
               Pending production scope approval.
             </p>
             <button
               disabled
-              className="bg-slate-700 text-slate-500 text-sm font-medium rounded-lg py-2 cursor-not-allowed"
+              className="text-sm font-medium rounded-lg py-2 cursor-not-allowed"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                color: '#334155',
+                border: '1px solid rgba(255,255,255,0.06)',
+              }}
             >
               Log in with Quran.com (coming soon)
             </button>
@@ -205,11 +299,13 @@ export default function Settings() {
 
       {/* Saved indicator */}
       <div
-        className={`text-center text-xs text-teal-400 transition-opacity duration-300 ${
-          saved ? 'opacity-100' : 'opacity-0'
-        }`}
+        className="text-center text-xs transition-opacity duration-300"
+        style={{
+          color: '#14b8a6',
+          opacity: saved ? 1 : 0,
+        }}
       >
-        Settings saved
+        ✓ Settings saved
       </div>
     </div>
   )
