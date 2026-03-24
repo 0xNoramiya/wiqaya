@@ -22,23 +22,6 @@ type SettingsState = Pick<
   'translationId' | 'recitationId' | 'autoPlayAudio' | 'globalTimeLimitMinutes' | 'theme'
 >
 
-const cardStyle: React.CSSProperties = {
-  background: 'linear-gradient(135deg, #111827, #0d1424)',
-  border: '1px solid rgba(212,175,55,0.15)',
-  borderRadius: '0.75rem',
-  padding: '1rem',
-}
-
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  fontSize: '10px',
-  fontWeight: 600,
-  textTransform: 'uppercase',
-  letterSpacing: '0.1em',
-  color: '#64748b',
-  marginBottom: '8px',
-}
-
 export default function Settings() {
   const [settings, setSettings] = useState<SettingsState>({
     translationId: 85,
@@ -50,6 +33,29 @@ export default function Settings() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [authLoading, setAuthLoading] = useState(true)
   const [saved, setSaved] = useState(false)
+
+  const isLight = settings.theme === 'light'
+
+  const cardStyle: React.CSSProperties = {
+    background: isLight
+      ? 'linear-gradient(135deg, #ffffff, #f5f0e8)'
+      : 'linear-gradient(135deg, #111827, #0d1424)',
+    border: isLight
+      ? '1px solid #e8e0d4'
+      : '1px solid rgba(212,175,55,0.15)',
+    borderRadius: '0.75rem',
+    padding: '1rem',
+  }
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '10px',
+    fontWeight: 600,
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em',
+    color: isLight ? '#6b6b7b' : '#64748b',
+    marginBottom: '8px',
+  }
 
   useEffect(() => {
     chrome.storage.local.get(
@@ -95,12 +101,12 @@ export default function Settings() {
 
   const selectStyle: React.CSSProperties = {
     width: '100%',
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    background: isLight ? '#f5f0e8' : 'rgba(255,255,255,0.05)',
+    border: isLight ? '1px solid #d8d0c4' : '1px solid rgba(255,255,255,0.1)',
     borderRadius: '0.5rem',
     padding: '8px 36px 8px 12px',
     fontSize: '13px',
-    color: 'white',
+    color: isLight ? '#1a1a2e' : 'white',
     cursor: 'pointer',
     appearance: 'none',
     WebkitAppearance: 'none',
@@ -120,8 +126,8 @@ export default function Settings() {
         <div
           style={{
             display: 'flex',
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.05)',
+            border: isLight ? '1px solid #e0d8cc' : '1px solid rgba(255,255,255,0.08)',
             borderRadius: '0.625rem',
             padding: '3px',
             gap: '3px',
@@ -216,14 +222,14 @@ export default function Settings() {
         <div className="flex items-center justify-between">
           <div>
             <p style={labelStyle as React.CSSProperties}>Auto-play Audio</p>
-            <p className="text-xs" style={{ color: '#475569' }}>
+            <p className="text-xs" style={{ color: isLight ? '#8a8a9a' : '#475569' }}>
               Play recitation automatically on overlay
             </p>
           </div>
           <div className="flex items-center gap-2">
             <span
               className="text-xs transition-all duration-200"
-              style={{ color: settings.autoPlayAudio ? '#D4AF37' : '#334155' }}
+              style={{ color: settings.autoPlayAudio ? '#D4AF37' : isLight ? '#9a9aaa' : '#334155' }}
             >
               {settings.autoPlayAudio ? 'ON' : 'OFF'}
             </span>
@@ -235,7 +241,7 @@ export default function Settings() {
               style={{
                 background: settings.autoPlayAudio
                   ? 'linear-gradient(135deg, #14b8a6, #0d9488)'
-                  : 'rgba(255,255,255,0.1)',
+                  : isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)',
               }}
             >
               <span
@@ -302,7 +308,7 @@ export default function Settings() {
       >
         <h2 style={{ ...labelStyle as React.CSSProperties, marginBottom: 12 }}>Account</h2>
         {authLoading ? (
-          <p className="text-sm" style={{ color: '#475569' }}>Loading…</p>
+          <p className="text-sm" style={{ color: isLight ? '#8a8a9a' : '#475569' }}>Loading…</p>
         ) : isLoggedIn ? (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -333,7 +339,7 @@ export default function Settings() {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            <p className="text-sm leading-relaxed" style={{ color: '#64748b' }}>
+            <p className="text-sm leading-relaxed" style={{ color: isLight ? '#8a8a9a' : '#64748b' }}>
               Quran.com login for streaks and bookmarks — coming soon.
               Pending production scope approval.
             </p>
@@ -341,9 +347,9 @@ export default function Settings() {
               disabled
               className="text-sm font-medium rounded-lg py-2 cursor-not-allowed"
               style={{
-                background: 'rgba(255,255,255,0.04)',
-                color: '#334155',
-                border: '1px solid rgba(255,255,255,0.06)',
+                background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)',
+                color: isLight ? '#9a9aaa' : '#334155',
+                border: isLight ? '1px solid #e0d8cc' : '1px solid rgba(255,255,255,0.06)',
               }}
             >
               Log in with Quran.com (coming soon)
