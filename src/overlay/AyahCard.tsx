@@ -20,13 +20,11 @@ export default function AyahCard({
     <div className="wiqaya-card-border">
       <div className="wiqaya-card">
 
-        {/* Corner decorations */}
         <div className="wiqaya-corner wiqaya-corner-tl" />
         <div className="wiqaya-corner wiqaya-corner-tr" />
         <div className="wiqaya-corner wiqaya-corner-bl" />
         <div className="wiqaya-corner wiqaya-corner-br" />
 
-        {/* Bookmark / heart button */}
         <button
           className={`wiqaya-bookmark-btn${isBookmarked ? ' wiqaya-bookmarked' : ''}`}
           onClick={onBookmark}
@@ -36,7 +34,6 @@ export default function AyahCard({
           {isBookmarked ? '♥' : '♡'}
         </button>
 
-        {/* Ornamental header — diamond ۞ diamond */}
         <div className="wiqaya-card-ornament">
           <div className="wiqaya-card-ornament-line" />
           <div className="wiqaya-card-ornament-center">
@@ -47,14 +44,12 @@ export default function AyahCard({
           <div className="wiqaya-card-ornament-line" />
         </div>
 
-        {/* Arabic verse — the hero */}
         <p className="wiqaya-arabic" lang="ar">
           {verse.textUthmani}
         </p>
 
         <div className="wiqaya-divider" />
 
-        {/* Verse reference badge */}
         <div className="wiqaya-reference">
           <span className="wiqaya-reference-arabic">{verse.chapterNameArabic}</span>
           <span className="wiqaya-reference-badge">
@@ -64,7 +59,6 @@ export default function AyahCard({
           </span>
         </div>
 
-        {/* Translation section */}
         {!translationRevealed ? (
           <button className="wiqaya-reveal-btn" onClick={onRevealTranslation}>
             <span className="wiqaya-reveal-btn-icon">✦</span>

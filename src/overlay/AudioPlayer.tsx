@@ -117,9 +117,7 @@ export default function AudioPlayer({ audioUrl, onPlay, autoPlay }: Props) {
 
   return (
     <div className="wiqaya-audio-player">
-      {/* Top row: play button | reciter info | waveform | time */}
       <div className="wiqaya-audio-top-row">
-        {/* Play / Pause button */}
         <button
           className={`wiqaya-audio-play-btn${isPlaying ? ' wiqaya-playing' : ''}`}
           onClick={handleTogglePlay}
@@ -149,13 +147,11 @@ export default function AudioPlayer({ audioUrl, onPlay, autoPlay }: Props) {
           )}
         </button>
 
-        {/* Reciter info */}
         <div className="wiqaya-audio-info">
           <span className="wiqaya-audio-label">Recitation</span>
           <span className="wiqaya-audio-reciter">{reciterName}</span>
         </div>
 
-        {/* Waveform equalizer */}
         <div className={`wiqaya-waveform${isPlaying ? ' wiqaya-wave-playing' : ''}`}>
           <div className="wiqaya-wave-bar" />
           <div className="wiqaya-wave-bar" />
@@ -166,7 +162,6 @@ export default function AudioPlayer({ audioUrl, onPlay, autoPlay }: Props) {
           <div className="wiqaya-wave-bar" />
         </div>
 
-        {/* Time display */}
         <span className="wiqaya-audio-time">
           {duration > 0
             ? `${formatTime(currentTime)} / ${formatTime(duration)}`
@@ -175,7 +170,6 @@ export default function AudioPlayer({ audioUrl, onPlay, autoPlay }: Props) {
         </span>
       </div>
 
-      {/* Bottom row: progress bar */}
       <div className="wiqaya-audio-bottom-row">
         <div className="wiqaya-audio-progress">
           <div

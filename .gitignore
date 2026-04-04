@@ -5,4 +5,6 @@ apikey
 *.pem
 .DS_Store
 *.local
+.serena/
+demo-video/
 docs/superpowers/

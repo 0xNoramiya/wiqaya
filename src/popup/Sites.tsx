@@ -97,7 +97,6 @@ export default function Sites() {
   return (
     <div className="p-4 flex flex-col gap-3">
 
-      {/* Watch list */}
       <div className="gold-card card-hover p-4">
         <h2
           className="text-xs font-semibold uppercase tracking-widest mb-3"
@@ -148,7 +147,6 @@ export default function Sites() {
                   }}
                 >
                   <div className="flex items-center gap-2.5">
-                    {/* Favicon placeholder */}
                     <div
                       className="flex items-center justify-center rounded-full text-white font-bold flex-shrink-0"
                       style={{
@@ -197,7 +195,6 @@ export default function Sites() {
         )}
       </div>
 
-      {/* Quick add */}
       <div className="gold-card card-hover p-4">
         <h2
           className="text-xs font-semibold uppercase tracking-widest mb-3"
@@ -245,7 +242,6 @@ export default function Sites() {
         </div>
       </div>
 
-      {/* Add site form */}
       <div className="gold-card card-hover p-4">
         <h2
           className="text-xs font-semibold uppercase tracking-widest mb-3"

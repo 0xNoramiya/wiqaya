@@ -5,7 +5,6 @@ import { getStorage, setStorage } from '../shared/storage'
 
 startTracking()
 
-// Set up message listener for content script and popup communication
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'GET_VERSE') {
     fetchRandomVerse().then(data => {

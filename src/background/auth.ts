@@ -1,8 +1,8 @@
-import { AUTH_URL, AUTH_TOKEN_URL, USER_API, AUTH_CLIENT_ID, AUTH_CLIENT_SECRET, MUSHAF_ID } from '../shared/constants'
+import { AUTH_URL, AUTH_TOKEN_URL, USER_API, AUTH_CLIENT_ID, AUTH_CLIENT_SECRET } from '../shared/constants'
 import { getStorage, setStorage } from '../shared/storage'
 import type { Bookmark } from '../shared/types'
 
-// --- PKCE Helpers ---
+const MUSHAF_ID = 1
 
 function generateCodeVerifier(): string {
   const array = new Uint8Array(32)
@@ -22,7 +22,6 @@ function generateState(): string {
   return crypto.randomUUID()
 }
 
-// --- Login Flow ---
 
 export async function startLogin(): Promise<boolean> {
   const verifier = generateCodeVerifier()
@@ -91,7 +90,6 @@ export async function startLogin(): Promise<boolean> {
   }
 }
 
-// --- Token Refresh ---
 
 export async function getValidAccessToken(): Promise<string | null> {
   const { accessToken, refreshToken, tokenExpiresAt } = await getStorage([
@@ -147,7 +145,6 @@ export async function getValidAccessToken(): Promise<string | null> {
   }
 }
 
-// --- User API Helpers ---
 
 async function getAuthHeaders(): Promise<Record<string, string> | null> {
   const accessToken = await getValidAccessToken()
@@ -159,7 +156,6 @@ async function getAuthHeaders(): Promise<Record<string, string> | null> {
   }
 }
 
-// --- Bookmark API ---
 
 export async function addBookmark(chapterNumber: number, verseNumber: number): Promise<boolean> {
   const headers = await getAuthHeaders()
@@ -208,7 +204,6 @@ export async function deleteBookmark(id: string): Promise<boolean> {
   }
 }
 
-// --- Reading Session / Activity ---
 
 export async function logReadingSession(chapterNumber: number, verseNumber: number): Promise<void> {
   const headers = await getAuthHeaders()
@@ -232,7 +227,6 @@ export async function logActivityDay(verseKey: string, seconds: number): Promise
   })
 }
 
-// --- Streaks ---
 
 export async function getStreaks(): Promise<{ days: number; status: string } | null> {
   const headers = await getAuthHeaders()
@@ -251,7 +245,6 @@ export async function getStreaks(): Promise<{ days: number; status: string } | n
   }
 }
 
-// --- Auth State ---
 
 export async function logout(): Promise<void> {
   await setStorage({ accessToken: null, refreshToken: null, tokenExpiresAt: null })

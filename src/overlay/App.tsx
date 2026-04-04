@@ -101,13 +101,10 @@ export default function App({ onDismiss }: Props) {
 
   return (
     <div className={`wiqaya-overlay${visible ? ' wiqaya-visible' : ''}${theme === 'light' ? ' wiqaya-light' : ''}`}>
-      {/* Blurred dark backdrop */}
       <div className="wiqaya-backdrop" />
 
-      {/* Central radial glow */}
       <div className="wiqaya-backdrop-glow" />
 
-      {/* Floating gold particles */}
       <div className="wiqaya-particles" aria-hidden="true">
         <div className="wiqaya-particle" />
         <div className="wiqaya-particle" />
@@ -120,7 +117,6 @@ export default function App({ onDismiss }: Props) {
         <div className="wiqaya-particle" />
       </div>
 
-      {/* Centered content */}
       <div className="wiqaya-content">
         {loading ? (
           <LoadingSpinner />

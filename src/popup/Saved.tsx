@@ -73,7 +73,6 @@ export default function Saved() {
           className="gold-card flex flex-col items-center gap-4 text-center p-6"
           style={{ borderColor: 'rgba(212,175,55,0.2)' }}
         >
-          {/* Book CSS art icon */}
           <div style={{ paddingTop: 8 }}>
             <div className="book-icon" />
           </div>
@@ -161,7 +160,6 @@ export default function Saved() {
                   }}
                 >
                   <div className="flex items-center gap-2.5">
-                    {/* Gold verse badge */}
                     <span className="verse-badge">{verseKey}</span>
                     <span className="text-xs" style={{ color: isLight ? '#8a8a9a' : '#475569' }}>
                       {formatDate(bookmark.createdAt)}

@@ -110,7 +110,7 @@ export default function Dashboard() {
   return (
     <div className="p-4 flex flex-col gap-3">
 
-      {/* Onboarding welcome card */}
+
       {isOnboarding && (
         <div
           className="gold-card p-5 flex flex-col items-center gap-3 text-center"
@@ -146,7 +146,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Verses Read — hero stat */}
+
       <div className="gold-card card-hover p-4">
         <h2
           className="text-xs font-semibold uppercase tracking-widest mb-3"
@@ -155,7 +155,7 @@ export default function Dashboard() {
           Verses Read
         </h2>
         <div className="flex items-center">
-          {/* Today */}
+
           <div className="flex-1 flex flex-col items-center">
             <span
               className="text-4xl font-bold gold-glow"
@@ -166,14 +166,14 @@ export default function Dashboard() {
             <span className="text-xs mt-1" style={{ color: isLight ? '#6b6b7b' : '#64748b' }}>Today</span>
           </div>
 
-          {/* Divider diamond */}
+
           <div className="flex flex-col items-center gap-1 px-2">
             <div style={{ width: 1, height: 20, background: 'rgba(212,175,55,0.2)' }} />
             <span style={{ color: '#D4AF37', fontSize: 10 }}>◆</span>
             <div style={{ width: 1, height: 20, background: 'rgba(212,175,55,0.2)' }} />
           </div>
 
-          {/* All Time */}
+
           <div className="flex-1 flex flex-col items-center">
             <span className="text-4xl font-bold" style={{ color: '#14b8a6' }}>
               {data.totalVersesRead}
@@ -183,7 +183,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Time Tracked */}
+
       <div className="gold-card card-hover p-4">
         <h2
           className="text-xs font-semibold uppercase tracking-widest mb-3"
@@ -261,7 +261,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Streak */}
+
       <div className="gold-card card-hover p-4">
         <h2
           className="text-xs font-semibold uppercase tracking-widest mb-3"

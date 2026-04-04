@@ -42,7 +42,6 @@ export default function App() {
     chrome.storage.local.get(['theme'], (result) => {
       setTheme(result.theme ?? 'dark')
     })
-    // Listen for theme changes made in Settings
     const listener = (changes: Record<string, chrome.storage.StorageChange>) => {
       if (changes.theme) setTheme(changes.theme.newValue ?? 'dark')
     }
@@ -57,7 +56,6 @@ export default function App() {
       style={{ width: 400, minHeight: 500, background: isLight ? '#f8f6f1' : '#0a0f1e' }}
       className={`${isLight ? 'wiqaya-light' : ''} text-white flex flex-col`}
     >
-      {/* Header */}
       <div
         style={{
           background: isLight
@@ -86,7 +84,6 @@ export default function App() {
       </div>
       <div className="header-gold-line mx-0" />
 
-      {/* Tab bar */}
       <div
         style={{
           background: isLight ? '#f8f6f1' : '#0a0f1e',
@@ -123,7 +120,6 @@ export default function App() {
         })}
       </div>
 
-      {/* Tab content */}
       <div className="flex-1 overflow-y-auto">
         {activeTab === 'Dashboard' && <Dashboard />}
         {activeTab === 'Sites' && <Sites />}
@@ -131,7 +127,6 @@ export default function App() {
         {activeTab === 'Settings' && <Settings />}
       </div>
 
-      {/* Footer */}
       <div
         style={{
           borderTop: '1px solid rgba(212,175,55,0.07)',

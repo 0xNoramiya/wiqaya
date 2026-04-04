@@ -2,62 +2,52 @@
 
 **Your screen time, redeemed.**
 
-Wiqaya (وقاية — "protection" in Arabic) is a Chrome extension that monitors time spent on distracting websites and overlays a beautiful Quran verse gate — transforming doomscrolling into an opportunity for Quran connection.
+Wiqaya is a Chrome extension that monitors time on distracting websites and overlays a Quran verse gate — transforming doomscrolling into moments of reflection.
 
 Built for the **Quran Foundation Hackathon 2026**.
 
 ## How It Works
 
-1. **Add distracting sites** — twitter.com, reddit.com, youtube.com, etc.
-2. **Set time limits** — global or per-site (default: 1 minute for testing, configurable up to 60)
-3. **Browse normally** — Wiqaya tracks time in the background with a badge indicator
-4. **Threshold exceeded** — a full-page overlay fades in with a random Quran verse
-5. **Engage** — read the Arabic text, reveal the translation, listen to the recitation
-6. **Continue** — after engaging with the verse, a "Continue Browsing" button appears with a grace period
-7. **Track progress** — see verses read, time tracked per site, and streaks in the popup dashboard
+1. **Add sites** — twitter.com, reddit.com, youtube.com, etc.
+2. **Set time limits** — global or per-site (1–60 minutes)
+3. **Browse normally** — Wiqaya tracks time with a badge counter
+4. **Threshold hit** — a full-page verse overlay fades in
+5. **Engage** — read Arabic text, reveal translation, listen to recitation
+6. **Continue** — after engaging, dismiss and get a grace period
 
 ## Features
 
-### Core
-- **Time Tracking** — per-site time limits with live badge counter on the extension icon
-- **Quran Verse Overlay** — immersive, contemplative full-page gate with:
-  - Arabic text in Amiri font (the visual hero)
-  - "Reveal Translation" interaction (Arabic first, tap to show meaning)
-  - Audio recitation with waveform visualizer (auto-play option)
-  - Bookmark button to save verses
-  - Animated gold particles, shimmer effects, and gradient borders
-- **Popup Dashboard** — real-time stats: time per site, verses read today/all-time, streak count
-- **Site Management** — watch list with quick-add for common sites, custom domains + limits
-- **Dark/Light Theme** — warm paper-like light mode inspired by a physical mushaf
+- **Quran Verse Overlay** — Arabic in Uthmani script (Amiri font), tap-to-reveal translation, audio recitation with waveform visualizer, bookmark button
+- **Time Tracking** — per-site limits, live badge counter, daily reset at midnight
+- **Popup Dashboard** — verses read today/all-time, time per site, streak counter, live refresh
+- **Site Management** — watch list, quick-add common sites, custom domains
+- **Engagement Gating** — "Continue Browsing" only after 30s, translation reveal, or audio play
+- **Bookmarks & Streaks** — save verses, track daily reading streaks
+- **Dark/Light Theme** — warm mushaf-inspired light mode
 
-### Quran Foundation API Integration
-- **Content API** (no login required):
-  - Random verse with Uthmani script (`/api/v4/verses/random`)
-  - Translations fetched separately (`/api/v4/quran/translations/{id}`)
-  - Audio recitation from CDN (`/api/v4/recitations/{id}/by_ayah/{key}`)
-  - Chapter names cached locally (`/api/v4/chapters`)
-- **User API** (requires OAuth2 login — pending scope approval):
-  - Bookmarks — save/list/delete favorite verses
-  - Reading Sessions — log each verse interaction
-  - Activity Days — track daily Quran engagement
-  - Streaks — maintain reading streaks
+## Quran Foundation API Usage
 
-### UX Polish
-- Onboarding welcome state for new users
-- Error retry on verse fetch failure
-- Live dashboard refresh (updates while popup is open)
-- Smooth animations throughout (fade-in, slide-up, pulse-glow)
-- Engagement gating: "Continue Browsing" only appears after 30 seconds, translation reveal, or audio play
-- Grace period after dismissing overlay (configurable)
-- Daily reset of time tracking at midnight
+### Content API (v4) — no login required
 
-## Installation
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /api/v4/verses/random` | Random verse with Uthmani script |
+| `GET /api/v4/quran/translations/{id}` | Translation for a verse |
+| `GET /api/v4/chapters` | Chapter names (cached) |
+| `GET /api/v4/recitations/{id}/by_ayah/{key}` | Audio recitation URL |
 
-### Prerequisites
-- Node.js 18+
-- Chrome browser
+### User API (v1) — OAuth2 PKCE
 
-### Setup
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /auth/v1/bookmarks` | Save verse bookmark |
+| `GET /auth/v1/bookmarks` | List bookmarks |
+| `DELETE /auth/v1/bookmarks/{id}` | Remove bookmark |
+| `POST /auth/v1/reading-sessions` | Log reading session |
+| `POST /auth/v1/activity-days` | Log daily activity |
+| `GET /auth/v1/streaks` | Reading streak data |
+
+## Setup
 
 ```bash
 git clone https://github.com/0xNoramiya/wiqaya.git
@@ -65,30 +55,28 @@ cd wiqaya
 npm install
 ```
 
-Create a `.env` file in the project root:
-```
-VITE_QF_CLIENT_ID=your_client_id
-VITE_QF_CLIENT_SECRET=your_client_secret
+Create `.env` from the example:
+
+```bash
+cp .env.example .env
+# Fill in your Quran Foundation API credentials
 ```
 
-### Build & Load
+Build and load:
 
 ```bash
 npm run build
 ```
 
-1. Open Chrome and navigate to `chrome://extensions`
-2. Enable **Developer mode** (toggle in top right)
-3. Click **Load unpacked**
-4. Select the `dist/` folder from the project
+1. Go to `chrome://extensions`
+2. Enable **Developer mode**
+3. Click **Load unpacked** → select the `dist/` folder
 
-### Development
+For development with hot reload:
 
 ```bash
 npm run dev
 ```
-
-Vite + CRXJS provides hot module replacement during development.
 
 ## Tech Stack
 
@@ -101,53 +89,27 @@ Vite + CRXJS provides hot module replacement during development.
 | Content API | Quran Foundation Content API v4 |
 | User API | Quran Foundation User API v1 |
 | Auth | OAuth2 Authorization Code + PKCE |
-| Fonts | Amiri (Arabic), Cormorant Garamond (translation) |
+| Overlay | Shadow DOM (style isolation) |
+| Fonts | Amiri (Arabic), Cormorant Garamond (English) |
 
 ## Architecture
 
 ```
 Background Service Worker
-  ├── Time tracking (chrome.alarms, chrome.tabs, chrome.idle)
-  ├── Content API (client_credentials token, verse/translation/audio fetch)
+  ├── Time tracking (chrome.alarms, tabs, idle)
+  ├── Content API (client_credentials, verse/translation/audio)
   └── User API (OAuth2 PKCE, bookmarks, streaks, sessions)
 
 Content Script (Shadow DOM)
-  └── Overlay injection (React app with isolated styles)
+  └── Overlay injection (React, isolated styles)
 
 Popup (React)
   ├── Dashboard (live stats)
-  ├── Sites (watch list management)
-  ├── Saved (bookmarked verses)
-  └── Settings (theme, translation, reciter, time limit, auth)
+  ├── Sites (watch list)
+  ├── Saved (bookmarks)
+  └── Settings (theme, translation, reciter, time limit)
 ```
-
-## API Usage
-
-### Content API — Client Credentials (no user login)
-
-| Endpoint | Purpose |
-|----------|---------|
-| `GET /content/api/v4/verses/random` | Random verse with Uthmani script |
-| `GET /content/api/v4/quran/translations/{id}` | Translation text for a verse |
-| `GET /content/api/v4/chapters` | Chapter names (Arabic + English) |
-| `GET /content/api/v4/recitations/{id}/by_ayah/{key}` | Audio recitation URL |
-| `POST /oauth2/token` | Client credentials token (`grant_type=client_credentials`) |
-
-### User API — OAuth2 PKCE (requires login)
-
-| Endpoint | Purpose |
-|----------|---------|
-| `POST /auth/v1/bookmarks` | Save a verse bookmark |
-| `GET /auth/v1/bookmarks` | List saved bookmarks |
-| `DELETE /auth/v1/bookmarks/{id}` | Remove a bookmark |
-| `POST /auth/v1/reading-sessions` | Log a reading session |
-| `POST /auth/v1/activity-days` | Log daily activity |
-| `GET /auth/v1/streaks` | Get streak data |
 
 ## License
 
-This project was built for the Quran Foundation Hackathon 2026.
-
----
-
-*Wiqaya (وقاية) — "protection/prevention" in Arabic. Your screen time, redeemed.*
+Built for the Quran Foundation Hackathon 2026.
