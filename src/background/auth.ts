@@ -195,18 +195,38 @@ export async function logout(): Promise<void> {
 
 async function userFetch(path: string, init: RequestInit = {}): Promise<Response | null> {
   const token = await getAccessToken()
-  if (!token) return null
+  if (!token) {
+    console.warn('[Wiqaya/userFetch] no access token — request skipped:', init.method ?? 'GET', path)
+    return null
+  }
 
   const headers = new Headers(init.headers)
-  headers.set('Authorization', `Bearer ${token}`)
-  if (AUTH_CLIENT_ID && !headers.has('x-client-id')) {
-    headers.set('x-client-id', AUTH_CLIENT_ID)
-  }
+  // Quran Foundation APIs use these custom headers, not standard Authorization: Bearer.
+  headers.set('x-auth-token', token)
+  headers.set('x-client-id', AUTH_CLIENT_ID)
   if (init.body && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
   }
 
-  return fetch(`${USER_API}${path}`, { ...init, headers })
+  const url = `${USER_API}${path}`
+  const method = init.method ?? 'GET'
+  console.log('[Wiqaya/userFetch] →', method, url, init.body ? `body=${init.body}` : '')
+
+  let response: Response
+  try {
+    response = await fetch(url, { ...init, headers })
+  } catch (e) {
+    console.error('[Wiqaya/userFetch] network error:', method, url, e)
+    return null
+  }
+
+  if (!response.ok) {
+    const text = await response.clone().text().catch(() => '')
+    console.error('[Wiqaya/userFetch] ←', response.status, response.statusText, method, url, text)
+  } else {
+    console.log('[Wiqaya/userFetch] ←', response.status, method, url)
+  }
+  return response
 }
 
 // --- Bookmarks ---
