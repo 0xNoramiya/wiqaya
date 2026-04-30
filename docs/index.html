@@ -574,6 +574,25 @@
       letter-spacing: 0.04em;
     }
 
+    /* ============== Demo video frame ============== */
+    .video-frame {
+      position: relative;
+      max-width: 920px;
+      margin: 0 auto;
+      aspect-ratio: 16 / 9;
+      background: var(--cream-50);
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+    .video-frame iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+    }
+
     /* ============== Page-load reveal ============== */
     @media (prefers-reduced-motion: no-preference) {
       .reveal {
@@ -628,15 +647,41 @@
           </svg>
           Install Extension
         </a>
+        <a href="#watch" class="btn btn-secondary">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M4 3 v10 l9 -5 z"/>
+          </svg>
+          Watch demo
+        </a>
         <a href="https://github.com/0xNoramiya/wiqaya" class="btn btn-secondary" target="_blank" rel="noopener">
           <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.34c-2.22.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.05-.49.05-.49.81.06 1.23.83 1.23.83.72 1.22 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.74.54 1.49v2.21c0 .21.14.46.55.38A8 8 0 0 0 8 0z"/></svg>
-          View on GitHub
+          GitHub
         </a>
       </div>
 
       <div class="hero-badge reveal d4">
         <span class="dot"></span>
         Quran Foundation Hackathon · 2026
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== Demo video ============== -->
+  <section id="watch" style="background: var(--cream-100); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 80px 0;">
+    <div class="container">
+      <div class="section-head" style="text-align: center; margin-bottom: 40px;">
+        <span class="eyebrow">Demo &middot; 2:45</span>
+        <h2 class="section-title">See it in action</h2>
+        <p class="section-subtitle" style="margin-left: auto; margin-right: auto;">A short narrated walkthrough — the problem, the idea, and the verse experience.</p>
+      </div>
+      <div class="video-frame">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/lHm1ml_M68I?rel=0"
+          title="Wiqaya — demo video"
+          frameborder="0"
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+          loading="lazy"></iframe>
       </div>
     </div>
   </section>

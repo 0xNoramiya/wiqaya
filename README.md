@@ -6,7 +6,9 @@ Wiqaya is a Chrome extension that monitors time on distracting websites and over
 
 Built for the **Quran Foundation Hackathon 2026**.
 
-> Live page: <https://0xnoramiya.github.io/wiqaya/>
+**Landing page:** <https://0xnoramiya.github.io/wiqaya/>
+**Demo video (2:45):** <https://youtu.be/lHm1ml_M68I>
+**Latest release:** <https://github.com/0xNoramiya/wiqaya/releases/latest>
 
 ## Quick install (no build required)
 
@@ -106,7 +108,11 @@ npm run package
 
 ## Demo video
 
-A 2:45 narrated walk-through (1920×1080, ElevenLabs voiceover) is built with the [HyperFrames](https://hyperframes.dev) framework in `demo-video-hf/` (gitignored — you can render it locally). It has seven scenes: the problem, the idea (with وقاية as a visual anchor), the four-step method, the verse experience, a 20-second slot for a live screen recording, the feature summary, and the closing verse. To re-render:
+**Watch on YouTube:** <https://youtu.be/lHm1ml_M68I> — also embedded on the [landing page](https://0xnoramiya.github.io/wiqaya/#watch).
+
+A 2:45 narrated walk-through (1920×1080, ElevenLabs voiceover) built with the [HyperFrames](https://hyperframes.dev) framework. The source compositions live in `demo-video-hf/` (gitignored, regenerable locally). Seven scenes: the problem, the idea (with وقاية as a visual anchor), the four-step method, the verse experience, a 20-second slot for live screen-recording footage, the feature summary, and the closing verse.
+
+To re-render locally:
 
 ```bash
 cd demo-video-hf
