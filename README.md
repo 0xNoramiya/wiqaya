@@ -6,6 +6,18 @@ Wiqaya is a Chrome extension that monitors time on distracting websites and over
 
 Built for the **Quran Foundation Hackathon 2026**.
 
+## Quick install (no build required)
+
+For judges and anyone who just wants to try it:
+
+1. Download `wiqaya-extension.zip` from the [latest release](https://github.com/0xNoramiya/wiqaya/releases/latest).
+2. Unzip the file to any folder.
+3. Open `chrome://extensions` in Chrome and toggle on **Developer mode** (top right).
+4. Click **Load unpacked** and select the unzipped folder.
+5. Pin Wiqaya to your toolbar — click the icon to add a site and set a time limit.
+
+The released bundle is pre-built with valid Pre-Production Quran Foundation API credentials, so login, bookmarks, verse fetching, and streaks all work out of the box.
+
 ## How It Works
 
 1. **Add sites** — twitter.com, reddit.com, youtube.com, etc.
@@ -47,7 +59,7 @@ Built for the **Quran Foundation Hackathon 2026**.
 | `POST /auth/v1/activity-days` | Log daily activity |
 | `GET /auth/v1/streaks` | Reading streak data |
 
-## Setup
+## Build from source
 
 ```bash
 git clone https://github.com/0xNoramiya/wiqaya.git
@@ -76,6 +88,12 @@ For development with hot reload:
 
 ```bash
 npm run dev
+```
+
+Produce a distributable zip (`wiqaya-extension.zip` at repo root) for releases:
+
+```bash
+npm run package
 ```
 
 ## Tech Stack

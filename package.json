@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "package": "rm -rf wiqaya-extension.zip dist && npm run build && cd dist && zip -r ../wiqaya-extension.zip . && cd ..",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

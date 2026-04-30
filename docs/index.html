@@ -3,522 +3,588 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wiqaya — وقاية</title>
-  <meta name="description" content="A Chrome extension that overlays a Quran verse when you hit your time limit on distracting sites.">
+  <title>Wiqaya — وقاية | Your Screen Time, Redeemed</title>
+  <meta name="description" content="A Chrome extension that overlays a Quran verse when you hit your time limit on distracting websites.">
   <link rel="icon" href="./logo.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --paper:        #f6ecd8;
-      --paper-edge:   #ead9b8;
-      --paper-deep:   #ddc99c;
-      --ink:          #2b1f10;
-      --ink-soft:     #6b5a3e;
-      --ink-faint:    #a39576;
-      --gold:         #b88f3a;
-      --gold-deep:    #8a6520;
-      --gold-pale:    #e6d5a8;
-      --teal:         #2d5e5e;
-      --vermillion:   #a13b2a;
-      --rule:         #c8b994;
-      --rule-faint:   #ddcfaf;
+      --cream-50:   #fdfaf3;
+      --cream-100:  #faf5e9;
+      --cream-200:  #f5ecd9;
+      --cream-300:  #ede0c0;
+      --border:     #ede4d0;
+      --border-strong: #d8c9a6;
+
+      --ink-900:    #1a1410;
+      --ink-800:    #2d2419;
+      --ink-700:    #3d3326;
+      --ink-500:    #6e6151;
+      --ink-400:    #8a7e69;
+      --ink-300:    #b3a78f;
+
+      --gold-300:   #e2c98a;
+      --gold-500:   #b88f3a;
+      --gold-600:   #9a7424;
+      --gold-700:   #7a5a16;
+      --gold-soft:  #f4e9cb;
+
+      --teal-500:   #2c7a7a;
+      --teal-600:   #235e5e;
+      --teal-soft:  #d9eaea;
+
+      --shadow-sm:  0 1px 2px rgba(60, 45, 20, 0.04);
+      --shadow-md:  0 4px 16px rgba(60, 45, 20, 0.06), 0 1px 3px rgba(60, 45, 20, 0.04);
+      --shadow-lg:  0 12px 40px rgba(60, 45, 20, 0.08), 0 2px 6px rgba(60, 45, 20, 0.04);
     }
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--paper);
-      color: var(--ink);
-      font-family: 'EB Garamond', 'Cormorant Garamond', Georgia, serif;
-      font-size: 19px;
-      line-height: 1.7;
-      font-feature-settings: "kern", "liga", "dlig", "onum";
+      background: var(--cream-50);
+      color: var(--ink-800);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      text-rendering: geometricPrecision;
+      letter-spacing: -0.005em;
     }
 
-    /* ----- Subtle paper grain (SVG-based fractal noise, very faint) ----- */
+    /* Soft warm gradient at top of page */
     body::before {
       content: '';
       position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.18  0 0 0 0 0.13  0 0 0 0 0.06  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-      opacity: 0.55;
-      mix-blend-mode: multiply;
-    }
-    /* ----- Vignette around the edges, like an aged page ----- */
-    body::after {
-      content: '';
-      position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      background: radial-gradient(ellipse at center, transparent 55%, rgba(82, 60, 22, 0.10) 100%);
+      background:
+        radial-gradient(80% 50% at 50% 0%, rgba(184, 143, 58, 0.08) 0%, transparent 60%),
+        radial-gradient(60% 40% at 100% 100%, rgba(44, 122, 122, 0.05) 0%, transparent 70%);
     }
 
-    .page {
+    .container {
       position: relative; z-index: 1;
-      max-width: 720px;
+      max-width: 1080px;
       margin: 0 auto;
-      padding: 96px 56px 72px;
+      padding: 0 28px;
     }
 
-    @media (max-width: 720px) {
-      body { font-size: 17.5px; }
-      .page { padding: 56px 28px 56px; }
+    /* ============== Reusable ============== */
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-600);
     }
+    .eyebrow::before {
+      content: '';
+      width: 28px; height: 1px;
+      background: var(--gold-500);
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 500;
+      font-size: clamp(34px, 4.5vw, 44px);
+      line-height: 1.15;
+      color: var(--ink-900);
+      letter-spacing: -0.005em;
+      margin-top: 16px;
+    }
+    .section-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 19px;
+      color: var(--ink-500);
+      margin-top: 12px;
+      max-width: 620px;
+      line-height: 1.5;
+    }
+    .section-head { margin-bottom: 56px; }
+
+    section { padding: 96px 0; }
 
     /* ============== HERO ============== */
     .hero {
+      padding: 88px 0 96px;
       text-align: center;
-      padding: 24px 0 72px;
+      position: relative;
     }
 
-    .pub-mark {
-      width: 22px; height: 22px;
-      margin: 0 auto 28px;
-      opacity: 0.7;
-      filter: sepia(0.3) saturate(1.2);
+    .hero-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(160deg, var(--cream-100), var(--cream-200));
+      box-shadow: var(--shadow-md), 0 0 0 1px var(--border) inset;
+      margin-bottom: 36px;
+    }
+    .hero-mark img {
+      width: 44px; height: 44px;
+      filter: sepia(0.1);
     }
 
     .hero-arabic {
       font-family: 'Amiri', serif;
       font-weight: 400;
-      color: var(--gold-deep);
-      font-size: clamp(72px, 14vw, 128px);
-      line-height: 1;
-      letter-spacing: 0.01em;
-      margin-bottom: 6px;
-      text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+      color: var(--gold-600);
+      font-size: clamp(86px, 14vw, 144px);
+      line-height: 1.05;
+      letter-spacing: 0.02em;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+      margin-bottom: 4px;
     }
 
-    /* Decorative rule with fleuron, manuscript style */
-    .rule-fleuron {
-      display: flex;
+    .hero-divider {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 18px;
-      margin: 28px auto 28px;
-      max-width: 320px;
+      gap: 14px;
+      margin: 18px auto 28px;
+      color: var(--gold-500);
     }
-    .rule-fleuron .line {
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold) 40%, var(--gold) 60%, transparent);
+    .hero-divider .line {
+      display: block;
+      width: 56px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-500));
     }
-    .rule-fleuron .fleur {
-      color: var(--gold-deep);
-      font-size: 14px;
+    .hero-divider .line.right {
+      background: linear-gradient(90deg, var(--gold-500), transparent);
     }
+    .hero-divider svg { display: block; }
 
     .hero-title {
       font-family: 'Cormorant Garamond', serif;
       font-weight: 500;
-      font-size: clamp(36px, 7vw, 56px);
-      letter-spacing: 0.34em;
-      text-transform: uppercase;
-      color: var(--ink);
-      line-height: 1;
-      padding-left: 0.34em;
-    }
-    .hero-subtitle {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 400;
-      font-style: italic;
-      font-size: 22px;
-      color: var(--ink-soft);
-      margin-top: 18px;
-      letter-spacing: 0.005em;
-    }
-
-    .hero-description {
-      max-width: 520px;
-      margin: 32px auto 36px;
-      color: var(--ink-soft);
-      font-size: 19px;
-      line-height: 1.75;
-      text-align: justify;
-      hyphens: auto;
-    }
-
-    .hero-links {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: 17px;
-      color: var(--ink);
-      letter-spacing: 0.03em;
-    }
-    .hero-links a { color: inherit; }
-    .hero-links .sep { color: var(--ink-faint); margin: 0 14px; }
-
-    .hero-attribution {
-      margin-top: 56px;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 12px;
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      color: var(--vermillion);
-    }
-    .hero-attribution .roman {
-      color: var(--ink-faint);
+      font-size: clamp(46px, 6vw, 68px);
       letter-spacing: 0.18em;
-    }
-
-    /* ============== Links (manuscript convention) ============== */
-    a {
-      color: var(--gold-deep);
-      text-decoration: none;
-      background-image: linear-gradient(var(--gold-pale), var(--gold-pale));
-      background-size: 0% 1px;
-      background-position: 0% 100%;
-      background-repeat: no-repeat;
-      padding-bottom: 1px;
-      transition: background-size 220ms ease, color 220ms ease;
-    }
-    a:hover {
-      background-size: 100% 2px;
-      color: var(--ink);
-    }
-
-    /* ============== SECTIONS ============== */
-    section {
-      padding: 56px 0;
-      border-top: 1px solid var(--rule-faint);
-    }
-    .section-head {
-      text-align: center;
-      margin-bottom: 48px;
-    }
-    .section-number {
-      display: inline-block;
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 500;
-      font-size: 13px;
-      letter-spacing: 0.4em;
-      color: var(--gold-deep);
       text-transform: uppercase;
+      color: var(--ink-900);
+      line-height: 1;
+      padding-left: 0.18em;
     }
-    .section-number::before, .section-number::after {
-      content: '·';
-      margin: 0 14px;
-      color: var(--gold);
-    }
-    .section-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 500;
-      font-size: clamp(30px, 4.6vw, 38px);
-      color: var(--ink);
-      margin-top: 18px;
-      letter-spacing: 0.005em;
-    }
-    .section-subtitle {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      color: var(--ink-soft);
-      font-size: 18px;
-      margin-top: 6px;
-    }
-
-    /* ============== HOW IT WORKS — table of steps ============== */
-    .steps {
-      display: grid;
-      grid-template-columns: 1fr;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    .step {
-      display: grid;
-      grid-template-columns: 56px 1fr;
-      gap: 28px;
-      padding: 24px 0;
-      border-top: 1px solid var(--rule-faint);
-    }
-    .step:first-child { border-top: none; }
-    .step-num {
+    .hero-tagline {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-weight: 400;
-      color: var(--gold-deep);
-      font-size: 30px;
-      line-height: 1;
-      padding-top: 4px;
-      text-align: right;
-      letter-spacing: 0.02em;
-    }
-    .step-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 500;
-      font-size: 21px;
-      color: var(--ink);
-      margin-bottom: 4px;
+      font-size: 24px;
+      color: var(--gold-700);
+      margin-top: 14px;
       letter-spacing: 0.005em;
     }
-    .step-desc {
-      color: var(--ink-soft);
-      font-size: 17px;
-      line-height: 1.65;
+    .hero-description {
+      max-width: 580px;
+      margin: 28px auto 36px;
+      color: var(--ink-700);
+      font-size: 18px;
+      line-height: 1.7;
     }
 
-    /* ============== FEATURES — table of contents style ============== */
-    .features {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 18px;
-      max-width: 620px;
-      margin: 0 auto;
+    .hero-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
-    .feature {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: baseline;
-      gap: 12px;
-      padding: 4px 0;
-    }
-    .feature-name {
-      font-family: 'Cormorant Garamond', serif;
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 24px;
+      border-radius: 999px;
+      font-size: 15px;
       font-weight: 500;
-      color: var(--ink);
-      font-size: 19px;
+      letter-spacing: -0.005em;
+      text-decoration: none;
+      transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease, color 200ms ease;
+      cursor: pointer;
+      border: 1px solid transparent;
     }
-    /* Dotted leaders, like a TOC */
-    .feature-leader {
-      flex: 1;
-      border-bottom: 1px dotted var(--rule);
-      transform: translateY(-4px);
+    .btn-primary {
+      background: var(--ink-900);
+      color: var(--cream-50);
+      box-shadow: var(--shadow-md);
     }
-    .feature-num {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      color: var(--gold-deep);
-      font-size: 14px;
-      letter-spacing: 0.05em;
-      white-space: nowrap;
+    .btn-primary:hover {
+      background: var(--ink-800);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg);
     }
-    .feature-detail {
-      grid-column: 1 / -1;
-      color: var(--ink-soft);
-      font-size: 16px;
-      line-height: 1.6;
-      margin-top: 2px;
-      max-width: 540px;
+    .btn-secondary {
+      background: transparent;
+      color: var(--ink-800);
+      border-color: var(--border-strong);
+    }
+    .btn-secondary:hover {
+      background: var(--cream-100);
+      border-color: var(--gold-500);
+      color: var(--ink-900);
+    }
+    .btn svg { width: 16px; height: 16px; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 36px;
+      padding: 7px 16px;
+      background: var(--cream-100);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-500);
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold-500);
     }
 
-    /* ============== API — open-spread ============== */
-    .api-spread {
+    /* ============== I. HOW IT WORKS ============== */
+    .how-grid {
       display: grid;
-      grid-template-columns: 1fr 1px 1fr;
-      gap: 0 36px;
-      max-width: 720px;
-      margin: 0 auto;
-      align-items: stretch;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
     }
-    .api-gutter {
-      background: linear-gradient(180deg, transparent, var(--rule-faint) 12%, var(--rule-faint) 88%, transparent);
+    .how-card {
+      position: relative;
+      background: var(--cream-50);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 24px 28px;
+      transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
     }
-    .api-page-title {
+    .how-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-strong);
+    }
+    .how-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--gold-soft);
+      color: var(--gold-700);
       font-family: 'Cormorant Garamond', serif;
-      font-weight: 500;
-      font-size: 21px;
-      color: var(--ink);
-      letter-spacing: 0.01em;
-    }
-    .api-page-sub {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: 14px;
-      color: var(--ink-soft);
+      font-weight: 600;
+      font-size: 18px;
       margin-bottom: 18px;
     }
-    .api-list {
-      list-style: none;
-      font-size: 14.5px;
+    .how-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      font-size: 22px;
+      color: var(--ink-900);
+      margin-bottom: 8px;
+      letter-spacing: -0.005em;
     }
+    .how-desc {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-500);
+    }
+    @media (max-width: 920px) { .how-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px) { .how-grid { grid-template-columns: 1fr; } }
+
+    /* ============== II. FEATURES ============== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--cream-50);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-strong);
+    }
+    .feature-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px; height: 42px;
+      border-radius: 11px;
+      background: linear-gradient(160deg, var(--cream-100), var(--cream-200));
+      border: 1px solid var(--border);
+      color: var(--gold-600);
+      margin-bottom: 16px;
+    }
+    .feature-icon svg { width: 22px; height: 22px; }
+    .feature-card.accent .feature-icon {
+      background: linear-gradient(160deg, var(--teal-soft), #c9dfdf);
+      color: var(--teal-600);
+      border-color: #b9d3d3;
+    }
+    .feature-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      font-size: 20px;
+      color: var(--ink-900);
+      margin-bottom: 6px;
+      letter-spacing: -0.005em;
+    }
+    .feature-desc {
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--ink-500);
+    }
+    @media (max-width: 920px) { .features-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px) { .features-grid { grid-template-columns: 1fr; } }
+
+    /* ============== III. API ============== */
+    .api-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .api-card {
+      background: var(--cream-50);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .api-card.gold { background: linear-gradient(160deg, #fefaf0, var(--cream-50)); }
+    .api-card.teal { background: linear-gradient(160deg, #f4faf9, var(--cream-50)); }
+    .api-card-head { margin-bottom: 22px; }
+    .api-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      font-size: 22px;
+      color: var(--ink-900);
+      letter-spacing: -0.005em;
+    }
+    .api-name .dim { color: var(--ink-300); font-weight: 400; }
+    .api-sub {
+      font-size: 13.5px;
+      color: var(--ink-500);
+      margin-top: 4px;
+    }
+    .api-list { list-style: none; }
     .api-list li {
       display: grid;
       grid-template-columns: 56px 1fr;
+      align-items: center;
       gap: 12px;
-      padding: 8px 0;
-      border-top: 1px dotted var(--rule);
-      font-family: 'EB Garamond', serif;
-      align-items: baseline;
+      padding: 10px 0;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
     }
-    .api-list li:first-child { border-top: none; }
-    .api-method {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 600;
-      font-size: 11px;
-      letter-spacing: 0.18em;
+    .api-list li:first-child { border-top: 1px solid var(--border); padding-top: 10px; }
+    .method {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-family: 'Inter', sans-serif;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      text-align: right;
     }
-    .m-get  { color: var(--teal); }
-    .m-post { color: var(--gold-deep); }
-    .m-del  { color: var(--vermillion); }
+    .m-get  { color: var(--teal-600); background: var(--teal-soft); }
+    .m-post { color: var(--gold-700); background: var(--gold-soft); }
+    .m-del  { color: #a13b2a; background: #f5dcd6; }
     .api-path {
-      font-style: italic;
-      color: var(--ink-soft);
-      font-size: 15.5px;
-      letter-spacing: 0.005em;
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      color: var(--ink-700);
+      letter-spacing: -0.01em;
       word-break: break-all;
     }
+    @media (max-width: 720px) { .api-grid { grid-template-columns: 1fr; } }
 
-    @media (max-width: 720px) {
-      .api-spread { grid-template-columns: 1fr; gap: 0; }
-      .api-gutter { display: none; }
-      .api-spread > .api-page + .api-page { margin-top: 36px; padding-top: 36px; border-top: 1px solid var(--rule-faint); }
+    /* ============== IV. TECH ============== */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
     }
-
-    /* ============== COLOPHON (Tech) ============== */
-    .colophon {
-      max-width: 540px;
-      margin: 0 auto;
-      text-align: center;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 18px;
-      line-height: 2;
-      color: var(--ink-soft);
-      font-style: italic;
+    .tech-card {
+      background: var(--cream-50);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 22px;
     }
-    .colophon strong {
-      font-weight: 500;
-      font-style: normal;
-      color: var(--ink);
-    }
-    .colophon em {
-      color: var(--gold-deep);
-      font-style: italic;
-    }
-
-    /* ============== INSTALL ============== */
-    .install {
-      max-width: 600px;
-      margin: 0 auto;
-      border: 1px solid var(--rule);
-      padding: 36px 40px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.18), transparent 30%),
-        var(--paper);
-      box-shadow:
-        0 1px 0 var(--paper-edge),
-        inset 0 0 0 4px var(--paper),
-        inset 0 0 0 5px var(--rule-faint);
-    }
-    .install h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 500;
-      font-size: 20px;
-      letter-spacing: 0.04em;
-      color: var(--ink);
-      text-align: center;
+    .tech-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold-600);
       margin-bottom: 6px;
     }
-    .install h3::before, .install h3::after {
-      content: '·'; margin: 0 12px; color: var(--gold);
-    }
-    .install p.lede {
+    .tech-value {
       font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: 15px;
-      color: var(--ink-soft);
-      text-align: center;
-      margin-bottom: 24px;
+      font-weight: 500;
+      font-size: 19px;
+      color: var(--ink-900);
+      letter-spacing: -0.005em;
     }
-    .install ol {
-      list-style: none;
-      counter-reset: step;
-      max-width: 460px;
-      margin: 0 auto;
-    }
-    .install li {
-      counter-increment: step;
-      position: relative;
-      padding: 12px 0 12px 44px;
-      border-top: 1px dotted var(--rule);
-      color: var(--ink-soft);
-      font-size: 16px;
-      line-height: 1.6;
-    }
-    .install li:first-child { border-top: none; }
-    .install li::before {
-      content: counter(step, lower-roman) '.';
-      position: absolute;
-      left: 0; top: 12px;
-      width: 32px;
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      color: var(--gold-deep);
-      font-size: 18px;
-      text-align: right;
-    }
-    .install code {
-      font-family: 'EB Garamond', serif;
-      font-style: italic;
-      color: var(--ink);
-      background: var(--paper-edge);
-      padding: 1px 6px;
-      border-radius: 1px;
-      font-size: 15.5px;
-      letter-spacing: 0.01em;
-      box-shadow: inset 0 -1px 0 var(--rule);
-    }
+    @media (max-width: 720px) { .tech-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 460px) { .tech-grid { grid-template-columns: 1fr; } }
 
-    /* ============== Drop cap (used on the description in features section opener) ============== */
-    .with-dropcap::first-letter {
+    /* ============== V. INSTALL ============== */
+    .install-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .install-card {
+      background: var(--cream-50);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 36px 32px;
+      position: relative;
+    }
+    .install-card.featured {
+      background: linear-gradient(180deg, #fefaf0, var(--cream-50));
+      border-color: var(--gold-300);
+      box-shadow: var(--shadow-md);
+    }
+    .install-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--ink-900);
+      color: var(--cream-50);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .install-card-title {
       font-family: 'Cormorant Garamond', serif;
       font-weight: 600;
-      color: var(--gold-deep);
-      font-size: 4em;
-      line-height: 0.85;
-      float: left;
-      padding-right: 12px;
-      padding-top: 4px;
-      padding-bottom: 0;
+      font-size: 24px;
+      color: var(--ink-900);
+      letter-spacing: -0.005em;
+      margin-bottom: 4px;
     }
+    .install-card-sub {
+      font-size: 14px;
+      color: var(--ink-500);
+      margin-bottom: 24px;
+    }
+    .install-steps {
+      list-style: none;
+      counter-reset: step;
+    }
+    .install-steps li {
+      counter-increment: step;
+      position: relative;
+      padding: 8px 0 8px 36px;
+      font-size: 14.5px;
+      line-height: 1.55;
+      color: var(--ink-700);
+    }
+    .install-steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0; top: 8px;
+      width: 24px; height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--cream-200);
+      color: var(--gold-700);
+      font-size: 12px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .install-card.featured .install-steps li::before {
+      background: var(--gold-soft);
+      color: var(--gold-700);
+    }
+    .install-steps code, .install-steps strong {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      background: var(--cream-200);
+      padding: 1px 7px;
+      border-radius: 4px;
+      color: var(--ink-900);
+      border: 1px solid var(--border);
+    }
+    .install-steps strong { font-weight: 600; }
+    @media (max-width: 720px) { .install-grid { grid-template-columns: 1fr; } }
 
     /* ============== Footer ============== */
     footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 56px 0 36px;
       text-align: center;
-      padding: 80px 0 12px;
-      border-top: 1px solid var(--rule-faint);
-      color: var(--ink-faint);
+      background: var(--cream-100);
     }
-    footer .final-mark {
+    footer .verse-mark {
       font-family: 'Amiri', serif;
-      font-size: 36px;
-      color: var(--gold-deep);
+      font-size: 32px;
+      color: var(--gold-600);
       line-height: 1;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
-    footer .verse {
+    footer .verse-text {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-size: 17px;
-      color: var(--ink-soft);
-      margin-bottom: 24px;
+      color: var(--ink-700);
+      max-width: 540px;
+      margin: 0 auto 28px;
+      line-height: 1.5;
     }
-    footer .meta {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 13px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--ink-faint);
+    footer .verse-text .ref { color: var(--gold-700); font-style: normal; }
+    footer .links {
+      font-size: 14px;
+      color: var(--ink-500);
     }
-    footer .meta a { color: var(--ink-soft); }
-    footer .meta .sep { margin: 0 12px; color: var(--rule); }
+    footer .links a {
+      color: var(--ink-700);
+      text-decoration: none;
+      padding: 0 12px;
+      transition: color 200ms ease;
+    }
+    footer .links a:hover { color: var(--gold-600); }
+    footer .links .sep { color: var(--ink-300); }
+    footer .copyright {
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--ink-400);
+      letter-spacing: 0.04em;
+    }
 
-    /* ============== Page-load reveal (gentle, staggered) ============== */
+    /* ============== Page-load reveal ============== */
     @media (prefers-reduced-motion: no-preference) {
       .reveal {
         opacity: 0;
         transform: translateY(8px);
-        animation: rise 900ms cubic-bezier(.2,.7,.2,1) forwards;
+        animation: rise 700ms cubic-bezier(.2,.7,.2,1) forwards;
       }
-      .reveal.d1 { animation-delay: 80ms; }
-      .reveal.d2 { animation-delay: 220ms; }
-      .reveal.d3 { animation-delay: 360ms; }
-      .reveal.d4 { animation-delay: 500ms; }
-      .reveal.d5 { animation-delay: 640ms; }
+      .reveal.d1 { animation-delay: 60ms; }
+      .reveal.d2 { animation-delay: 180ms; }
+      .reveal.d3 { animation-delay: 320ms; }
+      .reveal.d4 { animation-delay: 460ms; }
       @keyframes rise {
         to { opacity: 1; transform: translateY(0); }
       }
@@ -527,235 +593,307 @@
 </head>
 <body>
 
-  <main class="page">
-
-    <!-- ============== HERO ============== -->
-    <header class="hero">
-      <img src="./logo.png" alt="" class="pub-mark reveal">
+  <!-- ============== HERO ============== -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-mark reveal">
+        <img src="./logo.png" alt="">
+      </div>
 
       <div class="hero-arabic reveal d1" aria-label="Wiqaya in Arabic">وقاية</div>
 
-      <div class="rule-fleuron reveal d2">
+      <div class="hero-divider reveal d2">
         <span class="line"></span>
-        <!-- Hand-drawn fleuron -->
-        <svg class="fleur" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
-          <g fill="none" stroke="currentColor" stroke-width="0.8" stroke-linecap="round">
-            <circle cx="11" cy="11" r="2.2" fill="currentColor" stroke="none"/>
-            <path d="M11 4.5 C 12.6 7, 12.6 9, 11 11 C 9.4 9, 9.4 7, 11 4.5 Z" fill="currentColor"/>
-            <path d="M11 17.5 C 12.6 15, 12.6 13, 11 11 C 9.4 13, 9.4 15, 11 17.5 Z" fill="currentColor"/>
-            <path d="M4.5 11 C 7 9.4, 9 9.4, 11 11 C 9 12.6, 7 12.6, 4.5 11 Z" fill="currentColor"/>
-            <path d="M17.5 11 C 15 9.4, 13 9.4, 11 11 C 13 12.6, 15 12.6, 17.5 11 Z" fill="currentColor"/>
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+          <g fill="currentColor">
+            <circle cx="10" cy="10" r="1.6"/>
+            <path d="M10 3 C 11.3 5.5, 11.3 7.5, 10 9 C 8.7 7.5, 8.7 5.5, 10 3 Z" opacity="0.85"/>
+            <path d="M10 17 C 11.3 14.5, 11.3 12.5, 10 11 C 8.7 12.5, 8.7 14.5, 10 17 Z" opacity="0.85"/>
+            <path d="M3 10 C 5.5 11.3, 7.5 11.3, 9 10 C 7.5 8.7, 5.5 8.7, 3 10 Z" opacity="0.85"/>
+            <path d="M17 10 C 14.5 11.3, 12.5 11.3, 11 10 C 12.5 8.7, 14.5 8.7, 17 10 Z" opacity="0.85"/>
           </g>
         </svg>
-        <span class="line"></span>
+        <span class="line right"></span>
       </div>
 
       <h1 class="hero-title reveal d2">Wiqaya</h1>
-      <p class="hero-subtitle reveal d3">Your screen time, redeemed.</p>
+      <p class="hero-tagline reveal d3">Your screen time, redeemed.</p>
 
       <p class="hero-description reveal d3">A small Chrome extension that watches the time you spend on the sites you cannot put down — and, when the hour you set has passed, opens a single verse of the Qur’ān before letting you continue.</p>
 
-      <p class="hero-links reveal d4">
-        <a href="https://github.com/0xNoramiya/wiqaya" target="_blank" rel="noopener">View on GitHub</a>
-        <span class="sep">·</span>
-        <a href="#install">Install</a>
-      </p>
+      <div class="hero-actions reveal d4">
+        <a href="https://github.com/0xNoramiya/wiqaya/releases/latest" class="btn btn-primary">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 1v10M3 6l5 5 5-5M2 14h12"/>
+          </svg>
+          Install Extension
+        </a>
+        <a href="https://github.com/0xNoramiya/wiqaya" class="btn btn-secondary" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.34c-2.22.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.05-.49.05-.49.81.06 1.23.83 1.23.83.72 1.22 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.74.54 1.49v2.21c0 .21.14.46.55.38A8 8 0 0 0 8 0z"/></svg>
+          View on GitHub
+        </a>
+      </div>
 
-      <p class="hero-attribution reveal d5">
-        For the Quran Foundation Hackathon
-        <span class="roman"> · MMXXVI</span>
-      </p>
-    </header>
+      <div class="hero-badge reveal d4">
+        <span class="dot"></span>
+        Quran Foundation Hackathon · 2026
+      </div>
+    </div>
+  </section>
 
-    <!-- ============== I. HOW IT WORKS ============== -->
-    <section id="how">
+  <!-- ============== I. HOW IT WORKS ============== -->
+  <section id="how">
+    <div class="container">
       <div class="section-head">
-        <span class="section-number">I &nbsp;·&nbsp; The method</span>
+        <span class="eyebrow">I &nbsp;·&nbsp; The Method</span>
         <h2 class="section-title">How it works</h2>
-        <p class="section-subtitle">Four small movements, repeated patiently.</p>
+        <p class="section-subtitle">Four small movements, repeated patiently — the rest is up to you.</p>
       </div>
 
-      <div class="steps">
-        <article class="step">
-          <span class="step-num">i.</span>
-          <div>
-            <h3 class="step-title">Add the sites</h3>
-            <p class="step-desc">Name the places you keep returning to without intending to: <em>twitter.com</em>, <em>reddit.com</em>, <em>youtube.com</em>, or any others. They become your watch list.</p>
-          </div>
+      <div class="how-grid">
+        <article class="how-card">
+          <div class="how-num">1</div>
+          <h3 class="how-title">Add the sites</h3>
+          <p class="how-desc">Name the places you keep returning to without intending to — Twitter, Reddit, YouTube, or any other.</p>
         </article>
-        <article class="step">
-          <span class="step-num">ii.</span>
-          <div>
-            <h3 class="step-title">Set a limit</h3>
-            <p class="step-desc">Choose a number of minutes — between one and sixty — that feels honest. A single global limit, or a different one per site.</p>
-          </div>
+        <article class="how-card">
+          <div class="how-num">2</div>
+          <h3 class="how-title">Set a limit</h3>
+          <p class="how-desc">Choose a number of minutes that feels honest. A single global limit, or a different one per site.</p>
         </article>
-        <article class="step">
-          <span class="step-num">iii.</span>
-          <div>
-            <h3 class="step-title">Browse, while it counts</h3>
-            <p class="step-desc">A small badge on the toolbar keeps track. When you change tabs, lock your screen, or step away, it pauses. Nothing is sent anywhere.</p>
-          </div>
+        <article class="how-card">
+          <div class="how-num">3</div>
+          <h3 class="how-title">Browse, while it counts</h3>
+          <p class="how-desc">A small badge on the toolbar tracks the time. When you change tabs or step away, it pauses.</p>
         </article>
-        <article class="step">
-          <span class="step-num">iv.</span>
-          <div>
-            <h3 class="step-title">Pause, and read</h3>
-            <p class="step-desc">When the limit is met, a verse opens over the page. Read the Arabic, reveal the translation, listen if you wish, and carry on with a few extra minutes of quiet.</p>
-          </div>
+        <article class="how-card">
+          <div class="how-num">4</div>
+          <h3 class="how-title">Pause, and read</h3>
+          <p class="how-desc">When the limit is met, a verse opens over the page. Read it, listen to it, and carry on.</p>
         </article>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ============== II. FEATURES (TOC style) ============== -->
-    <section id="features">
+  <!-- ============== II. FEATURES ============== -->
+  <section id="features" style="background: var(--cream-100); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container">
       <div class="section-head">
-        <span class="section-number">II &nbsp;·&nbsp; What it offers</span>
+        <span class="eyebrow">II &nbsp;·&nbsp; Features</span>
         <h2 class="section-title">Designed for contemplation</h2>
-        <p class="section-subtitle">An index of the smaller things, in the order they were made.</p>
+        <p class="section-subtitle">Every detail is small, restrained, and chosen with intention.</p>
       </div>
 
-      <div class="features">
-        <article class="feature">
-          <span class="feature-name">Arabic in Uthmani script</span>
-          <span class="feature-leader"></span>
-          <span class="feature-num">i</span>
-          <p class="feature-detail">Set in Amiri, full-width, the verse is the page. The translation arrives only when you ask for it.</p>
+      <div class="features-grid">
+        <article class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Arabic in Uthmani Script</h3>
+          <p class="feature-desc">Set in Amiri, full-width, the verse is the page. The translation arrives only when you ask for it.</p>
         </article>
-        <article class="feature">
-          <span class="feature-name">Tap to reveal translation</span>
-          <span class="feature-leader"></span>
-          <span class="feature-num">ii</span>
-          <p class="feature-detail">English first hidden behind a small gesture, so the eye reads the Arabic before the mind reaches for meaning.</p>
+
+        <article class="feature-card accent">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Reveal Translation</h3>
+          <p class="feature-desc">English first hidden behind a small gesture, so the eye reads the Arabic before the mind reaches for meaning.</p>
         </article>
-        <article class="feature">
-          <span class="feature-name">Audio recitation</span>
-          <span class="feature-leader"></span>
-          <span class="feature-num">iii</span>
-          <p class="feature-detail">A small audio plate with a quiet waveform; choose between five reciters, or set the verse to play automatically.</p>
+
+        <article class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-7h3v5zM3 19a2 2 0 0 0 2 2h1v-7H3v5z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Audio Recitation</h3>
+          <p class="feature-desc">A quiet audio plate with waveform; choose between five reciters, or set the verse to play automatically.</p>
         </article>
-        <article class="feature">
-          <span class="feature-name">Bookmarks</span>
-          <span class="feature-leader"></span>
-          <span class="feature-num">iv</span>
-          <p class="feature-detail">Save the verses you wish to return to. They are kept under <em>Saved</em> in the popup, away from the rush of the day.</p>
+
+        <article class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Bookmarks</h3>
+          <p class="feature-desc">Save verses you wish to return to. They're kept under <em>Saved</em>, away from the rush of the day.</p>
         </article>
-        <article class="feature">
-          <span class="feature-name">Live dashboard</span>
-          <span class="feature-leader"></span>
-          <span class="feature-num">v</span>
-          <p class="feature-detail">Today’s verses, time per site, and the streak — three numbers and nothing more.</p>
+
+        <article class="feature-card accent">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Live Dashboard</h3>
+          <p class="feature-desc">Today's verses, time per site, and your streak — three numbers, nothing more.</p>
         </article>
-        <article class="feature">
-          <span class="feature-name">Light and dark themes</span>
-          <span class="feature-leader"></span>
-          <span class="feature-num">vi</span>
-          <p class="feature-detail">A warm, paper-like light mode for the day; a hushed dark mode for the night.</p>
+
+        <article class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Light & Dark Themes</h3>
+          <p class="feature-desc">A warm, paper-like light mode for the day; a hushed dark mode for the night.</p>
         </article>
-        <article class="feature">
-          <span class="feature-name">Reading streaks</span>
-          <span class="feature-leader"></span>
-          <span class="feature-num">vii</span>
-          <p class="feature-detail">A gentle counter of days kept. Not a leaderboard, not a grade — only a record of one’s own consistency.</p>
+
+        <article class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2s4 5 4 9a4 4 0 0 1-8 0c0-4 4-9 4-9z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Reading Streaks</h3>
+          <p class="feature-desc">A gentle counter of days kept. Not a leaderboard — only a record of your own consistency.</p>
         </article>
-        <article class="feature">
-          <span class="feature-name">Engagement gating</span>
-          <span class="feature-leader"></span>
-          <span class="feature-num">viii</span>
-          <p class="feature-detail">The “Continue Browsing” button waits, by design, until you have actually engaged with the verse. No reflex dismissal.</p>
+
+        <article class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Engagement Gating</h3>
+          <p class="feature-desc">"Continue Browsing" waits, by design, until you have actually engaged with the verse. No reflex dismissal.</p>
         </article>
-        <article class="feature">
-          <span class="feature-name">Considered detail</span>
-          <span class="feature-leader"></span>
-          <span class="feature-num">ix</span>
-          <p class="feature-detail">Quiet typography, restrained colour, hairline rules, and a Shadow-DOM overlay that never bleeds into the host page.</p>
+
+        <article class="feature-card accent">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Local-First Privacy</h3>
+          <p class="feature-desc">Your watchlist and time data never leave your browser. Only the verse APIs and your account are touched.</p>
         </article>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ============== III. API ============== -->
-    <section id="api">
+  <!-- ============== III. API ============== -->
+  <section id="api">
+    <div class="container">
       <div class="section-head">
-        <span class="section-number">III &nbsp;·&nbsp; Provenance</span>
+        <span class="eyebrow">III &nbsp;·&nbsp; Provenance</span>
         <h2 class="section-title">Powered by trusted sources</h2>
-        <p class="section-subtitle">All Qur’ānic content arrives from the Quran Foundation, in real time.</p>
+        <p class="section-subtitle">All Qur'ānic content arrives in real time from the Quran Foundation.</p>
       </div>
 
-      <div class="api-spread">
-        <div class="api-page">
-          <h3 class="api-page-title">Content API · v4</h3>
-          <p class="api-page-sub">Public; client-credentials grant.</p>
+      <div class="api-grid">
+        <div class="api-card teal">
+          <div class="api-card-head">
+            <div class="api-name">Content API <span class="dim">· v4</span></div>
+            <div class="api-sub">Public; client-credentials grant.</div>
+          </div>
           <ul class="api-list">
-            <li><span class="api-method m-get">Get</span><span class="api-path">/api/v4/verses/random</span></li>
-            <li><span class="api-method m-get">Get</span><span class="api-path">/api/v4/quran/translations/{id}</span></li>
-            <li><span class="api-method m-get">Get</span><span class="api-path">/api/v4/recitations/{id}/by_ayah/{key}</span></li>
-            <li><span class="api-method m-get">Get</span><span class="api-path">/api/v4/chapters</span></li>
+            <li><span class="method m-get">Get</span><span class="api-path">/api/v4/verses/random</span></li>
+            <li><span class="method m-get">Get</span><span class="api-path">/api/v4/quran/translations/{id}</span></li>
+            <li><span class="method m-get">Get</span><span class="api-path">/api/v4/recitations/{id}/by_ayah/{key}</span></li>
+            <li><span class="method m-get">Get</span><span class="api-path">/api/v4/chapters</span></li>
           </ul>
         </div>
-        <div class="api-gutter" aria-hidden="true"></div>
-        <div class="api-page">
-          <h3 class="api-page-title">User API · v1</h3>
-          <p class="api-page-sub">OAuth 2.0, Authorization Code with PKCE.</p>
+        <div class="api-card gold">
+          <div class="api-card-head">
+            <div class="api-name">User API <span class="dim">· v1</span></div>
+            <div class="api-sub">OAuth 2.0 — Authorization Code with PKCE.</div>
+          </div>
           <ul class="api-list">
-            <li><span class="api-method m-post">Post</span><span class="api-path">/auth/v1/bookmarks</span></li>
-            <li><span class="api-method m-get">Get</span><span class="api-path">/auth/v1/bookmarks</span></li>
-            <li><span class="api-method m-post">Post</span><span class="api-path">/auth/v1/reading-sessions</span></li>
-            <li><span class="api-method m-get">Get</span><span class="api-path">/auth/v1/streaks</span></li>
+            <li><span class="method m-post">Post</span><span class="api-path">/auth/v1/bookmarks</span></li>
+            <li><span class="method m-get">Get</span><span class="api-path">/auth/v1/bookmarks</span></li>
+            <li><span class="method m-post">Post</span><span class="api-path">/auth/v1/reading-sessions</span></li>
+            <li><span class="method m-get">Get</span><span class="api-path">/auth/v1/streaks</span></li>
           </ul>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ============== IV. COLOPHON (Tech Stack as colophon) ============== -->
-    <section id="colophon">
+  <!-- ============== IV. TECH ============== -->
+  <section id="tech" style="background: var(--cream-100); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container">
       <div class="section-head">
-        <span class="section-number">IV &nbsp;·&nbsp; Colophon</span>
-        <h2 class="section-title">Set & built</h2>
-        <p class="section-subtitle">The materials of this small work.</p>
+        <span class="eyebrow">IV &nbsp;·&nbsp; Built with</span>
+        <h2 class="section-title">Modern web technologies</h2>
+        <p class="section-subtitle">A small, sturdy stack — chosen for clarity and longevity.</p>
       </div>
 
-      <div class="colophon">
-        <p>Built upon <strong>Chrome Manifest V3</strong>, with a service worker that keeps quiet most of the day and rouses only on the alarm of a tick.</p>
-        <p>Set in <em>Amiri</em> for the Arabic, <em>Cormorant Garamond</em> for headings, and <em>EB Garamond</em> for body — all delivered by Google Fonts.</p>
-        <p>Authored in <strong>React 18</strong> and <strong>TypeScript</strong>, styled with <strong>Tailwind CSS v4</strong> and a small handful of bespoke rules, bundled by <strong>Vite 6</strong> through <strong>@crxjs/vite-plugin</strong>.</p>
-        <p>Verses, translations, audio, and the user record arrive from the <strong>Quran Foundation</strong>’s Content and User APIs. The overlay lives inside a <em>Shadow DOM</em>, so no host page can reach it.</p>
+      <div class="tech-grid">
+        <div class="tech-card"><div class="tech-label">Extension</div><div class="tech-value">Chrome Manifest V3</div></div>
+        <div class="tech-card"><div class="tech-label">Frontend</div><div class="tech-value">React 18 + TypeScript</div></div>
+        <div class="tech-card"><div class="tech-label">Styling</div><div class="tech-value">Tailwind CSS v4</div></div>
+        <div class="tech-card"><div class="tech-label">Build</div><div class="tech-value">Vite 6 + @crxjs</div></div>
+        <div class="tech-card"><div class="tech-label">Auth</div><div class="tech-value">OAuth 2.0 + PKCE</div></div>
+        <div class="tech-card"><div class="tech-label">Overlay</div><div class="tech-value">Shadow DOM (isolated)</div></div>
+        <div class="tech-card"><div class="tech-label">Content API</div><div class="tech-value">Quran Foundation v4</div></div>
+        <div class="tech-card"><div class="tech-label">User API</div><div class="tech-value">Quran Foundation v1</div></div>
+        <div class="tech-card"><div class="tech-label">Fonts</div><div class="tech-value">Amiri + Cormorant + Inter</div></div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ============== V. INSTALL ============== -->
-    <section id="install">
+  <!-- ============== V. INSTALL ============== -->
+  <section id="install">
+    <div class="container">
       <div class="section-head">
-        <span class="section-number">V &nbsp;·&nbsp; To begin</span>
+        <span class="eyebrow">V &nbsp;·&nbsp; To Begin</span>
         <h2 class="section-title">Install Wiqaya</h2>
-        <p class="section-subtitle">Seven small steps, the last of which is to start.</p>
+        <p class="section-subtitle">Two paths in — one for trying it now, one for changing the source.</p>
       </div>
 
-      <div class="install">
-        <h3>From source</h3>
-        <p class="lede">For developers and the curious.</p>
-        <ol>
-          <li>Clone the repository: <code>git clone https://github.com/0xNoramiya/wiqaya.git</code></li>
-          <li>Install the dependencies: <code>cd wiqaya &amp;&amp; npm install</code></li>
-          <li>Create a <code>.env</code> file with your Quran Foundation API credentials.</li>
-          <li>Build the extension: <code>npm run build</code></li>
-          <li>Open Chrome, go to <code>chrome://extensions</code>, and enable <em>Developer Mode</em>.</li>
-          <li>Click <em>Load unpacked</em> and select the <code>dist/</code> folder.</li>
-          <li>Pin Wiqaya to your toolbar, add a site, and choose your hour.</li>
-        </ol>
+      <div class="install-grid">
+        <div class="install-card featured">
+          <div class="install-tag">For everyone</div>
+          <h3 class="install-card-title">From release</h3>
+          <p class="install-card-sub">No build step. Pre-built bundle, ready to load.</p>
+          <ol class="install-steps">
+            <li>Download <code>wiqaya-extension.zip</code> from the <a href="https://github.com/0xNoramiya/wiqaya/releases/latest">latest release</a>.</li>
+            <li>Unzip the file to any folder.</li>
+            <li>Open <code>chrome://extensions</code> and enable <strong>Developer mode</strong>.</li>
+            <li>Click <strong>Load unpacked</strong> and select the unzipped folder.</li>
+            <li>Pin Wiqaya to the toolbar — click the icon to begin.</li>
+          </ol>
+        </div>
+
+        <div class="install-card">
+          <div class="install-tag" style="background: var(--cream-300); color: var(--ink-800);">For developers</div>
+          <h3 class="install-card-title">From source</h3>
+          <p class="install-card-sub">Build it yourself, with your own credentials.</p>
+          <ol class="install-steps">
+            <li>Clone: <code>git clone https://github.com/0xNoramiya/wiqaya.git</code></li>
+            <li>Install: <code>cd wiqaya &amp;&amp; npm install</code></li>
+            <li>Create <code>.env</code> with your Quran Foundation credentials.</li>
+            <li>Build: <code>npm run build</code></li>
+            <li>Load <code>dist/</code> as an unpacked extension at <code>chrome://extensions</code>.</li>
+          </ol>
+        </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-  </main>
-
+  <!-- ============== Footer ============== -->
   <footer>
-    <div class="final-mark" aria-hidden="true">۝</div>
-    <p class="verse">“And remind, for the reminder benefits the believers.” &nbsp;<span style="color:var(--gold-deep);">— 51:55</span></p>
-    <p class="meta">
-      <a href="./privacy.html">Privacy</a><span class="sep">·</span>
-      <a href="./terms.html">Terms</a><span class="sep">·</span>
-      <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a><span class="sep">·</span>
-      <a href="https://github.com/0xNoramiya/wiqaya" target="_blank" rel="noopener">GitHub</a>
-    </p>
+    <div class="container">
+      <div class="verse-mark" aria-hidden="true">۝</div>
+      <p class="verse-text">"And remind, for the reminder benefits the believers." <span class="ref">— Qur'ān 51:55</span></p>
+      <p class="links">
+        <a href="./privacy.html">Privacy</a>
+        <span class="sep">·</span>
+        <a href="./terms.html">Terms</a>
+        <span class="sep">·</span>
+        <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a>
+        <span class="sep">·</span>
+        <a href="https://github.com/0xNoramiya/wiqaya" target="_blank" rel="noopener">GitHub</a>
+      </p>
+      <p class="copyright">Built for the Quran Foundation Hackathon · MMXXVI</p>
+    </div>
   </footer>
 
 </body>
