@@ -8,4 +8,5 @@ apikey
 *.local
 .serena/
 demo-video/
+demo-video-hf/
 docs/superpowers/
