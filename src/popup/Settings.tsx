@@ -120,7 +120,6 @@ export default function Settings() {
   return (
     <div className="p-4 flex flex-col gap-3">
 
-      {/* Theme */}
       <div style={cardStyle} className="card-hover">
         <label style={labelStyle}>Theme</label>
         <div
@@ -173,7 +172,6 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Translation */}
       <div style={cardStyle} className="card-hover">
         <label style={labelStyle}>Translation</label>
         <select
@@ -195,7 +193,6 @@ export default function Settings() {
         </select>
       </div>
 
-      {/* Reciter */}
       <div style={cardStyle} className="card-hover">
         <label style={labelStyle}>Reciter</label>
         <select
@@ -217,7 +214,6 @@ export default function Settings() {
         </select>
       </div>
 
-      {/* Auto-play audio */}
       <div style={cardStyle} className="card-hover">
         <div className="flex items-center justify-between">
           <div>
@@ -255,7 +251,6 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Global Time Limit */}
       <div style={cardStyle} className="card-hover">
         <div className="flex items-center justify-between mb-2">
           <label style={labelStyle as React.CSSProperties}>
@@ -280,7 +275,6 @@ export default function Settings() {
           className="w-full cursor-pointer"
           style={{ accentColor: '#14b8a6' }}
         />
-        {/* Tick marks */}
         <div className="slider-ticks">
           {[
             { label: '1m' },
@@ -296,7 +290,6 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Account */}
       <div
         style={{
           ...cardStyle,
@@ -338,25 +331,28 @@ export default function Settings() {
         ) : (
           <div className="flex flex-col gap-2">
             <p className="text-sm leading-relaxed" style={{ color: isLight ? '#8a8a9a' : '#64748b' }}>
-              Quran.com login for streaks and bookmarks — coming soon.
-              Pending production scope approval.
+              Log in to track streaks, save bookmarks, and sync your reading progress.
             </p>
             <button
-              disabled
-              className="text-sm font-medium rounded-lg py-2 cursor-not-allowed"
+              onClick={handleLogin}
+              className="text-sm font-semibold rounded-lg py-2.5 transition-all duration-200"
               style={{
-                background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)',
-                color: isLight ? '#9a9aaa' : '#334155',
-                border: isLight ? '1px solid #e0d8cc' : '1px solid rgba(255,255,255,0.06)',
+                background: 'linear-gradient(135deg, #14b8a6, #0d9488)',
+                color: 'white',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = 'linear-gradient(135deg, #2dd4bf, #14b8a6)'
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = 'linear-gradient(135deg, #14b8a6, #0d9488)'
               }}
             >
-              Log in with Quran.com (coming soon)
+              Log in with Quran.com
             </button>
           </div>
         )}
       </div>
 
-      {/* Saved indicator */}
       <div
         className="text-center text-xs transition-opacity duration-300"
         style={{

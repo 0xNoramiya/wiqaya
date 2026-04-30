@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wiqaya — Terms of Service</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0a0e1a;
+      --card: #111827;
+      --gold: #D4AF37;
+      --teal: #14b8a6;
+      --white: #ffffff;
+      --slate: #94a3b8;
+      --slate-dark: #64748b;
+      --border: rgba(255,255,255,0.08);
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--white); line-height: 1.7; }
+    .container { max-width: 760px; margin: 0 auto; padding: 80px 24px 120px; }
+    .crumbs { font-size: 13px; color: var(--slate-dark); margin-bottom: 24px; }
+    .crumbs a { color: var(--gold); text-decoration: none; }
+    .crumbs a:hover { text-decoration: underline; }
+    h1 { font-size: 36px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em; }
+    .arabic { font-family: 'Amiri', serif; color: var(--gold); font-size: 28px; display: inline-block; margin-left: 12px; vertical-align: middle; }
+    .updated { color: var(--slate-dark); font-size: 13px; margin-bottom: 32px; }
+    h2 { font-size: 20px; font-weight: 600; margin-top: 36px; margin-bottom: 12px; color: var(--teal); letter-spacing: 0.01em; }
+    p, ul { color: var(--slate); margin-bottom: 12px; font-size: 15px; }
+    ul { padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    code { background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 4px; color: var(--teal); font-size: 13px; }
+    a { color: var(--gold); }
+    footer { border-top: 1px solid var(--border); padding: 32px 0; text-align: center; color: var(--slate-dark); font-size: 13px; }
+    footer a { color: var(--gold); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p class="crumbs"><a href="./">← Wiqaya</a></p>
+    <h1>Terms of Service <span class="arabic">وقاية</span></h1>
+    <p class="updated">Last updated: 2026-05-01</p>
+
+    <p>By installing or using the Wiqaya Chrome extension ("Wiqaya," "the extension"), you agree to the terms below. If you do not agree, please uninstall the extension.</p>
+
+    <h2>1. What Wiqaya is</h2>
+    <p>Wiqaya is a free, open-source browser extension that monitors time spent on websites you choose to track and overlays a Quran verse when configured time limits are reached. It was created as a submission for the Quran Foundation Hackathon 2026 and is provided as a personal-use tool, not a commercial product.</p>
+
+    <h2>2. Quran content and the Quran Foundation</h2>
+    <p>All Quran text, translations, and audio recitations displayed by Wiqaya are retrieved from the Quran Foundation APIs at the time of use. Wiqaya does not redistribute Quran content; it acts as a client of those APIs. Use of those APIs is also governed by any applicable terms set by the Quran Foundation. Please respect the source materials and the reciters whose voices are made available through those APIs.</p>
+
+    <h2>3. Acceptable use</h2>
+    <ul>
+      <li>Use Wiqaya for personal, non-commercial purposes consistent with its intended function.</li>
+      <li>Do not attempt to extract, scrape, or redistribute Quran content fetched through the extension in violation of the Quran Foundation's API terms.</li>
+      <li>Do not modify the extension to send user data to third parties or to circumvent the privacy guarantees described in the <a href="./privacy.html">Privacy Policy</a>.</li>
+    </ul>
+
+    <h2>4. Account and authentication</h2>
+    <p>If you sign in, you do so through the Quran Foundation's OAuth 2.0 service. Your account is governed by the Quran Foundation's terms. Wiqaya only stores the access and refresh tokens it receives, locally on your device, and uses them solely to call the User API on your behalf (bookmarks, reading sessions, streaks).</p>
+
+    <h2>5. No warranty</h2>
+    <p>Wiqaya is provided "as is" and "as available," without warranty of any kind, express or implied, including but not limited to fitness for a particular purpose, accuracy, or non-infringement. The maintainers do not guarantee uninterrupted operation, the availability of upstream APIs, or that the extension is free of bugs.</p>
+
+    <h2>6. Limitation of liability</h2>
+    <p>To the maximum extent permitted by law, the maintainers of Wiqaya shall not be liable for any indirect, incidental, consequential, or special damages arising from your use of, or inability to use, the extension — including loss of data, lost time, or any harm caused by reliance on information shown by the extension.</p>
+
+    <h2>7. Open source</h2>
+    <p>Wiqaya's source code is published under an open-source license at <a href="https://github.com/0xNoramiya/wiqaya" target="_blank">github.com/0xNoramiya/wiqaya</a>. You may inspect, modify, and redistribute it under the terms of that license. Forks and modifications are not endorsed by the original maintainers and must remove or alter Wiqaya branding before redistribution under a different name.</p>
+
+    <h2>8. Changes</h2>
+    <p>These terms may be updated as the project evolves. The updated date at the top of this page will reflect the most recent revision. Continued use of the extension after changes constitutes acceptance of the new terms.</p>
+
+    <h2>9. Contact</h2>
+    <p>For questions or issues, open a thread at <a href="https://github.com/0xNoramiya/wiqaya/issues" target="_blank">github.com/0xNoramiya/wiqaya/issues</a>.</p>
+  </div>
+
+  <footer>
+    <p style="font-family:'Amiri',serif; font-size:20px; color:var(--gold); margin-bottom:6px;">وقاية</p>
+    <p>Built for the <a href="https://quran.foundation" target="_blank">Quran Foundation</a> Hackathon 2026 · <a href="./privacy.html">Privacy</a> · <a href="./">Home</a></p>
+  </footer>
+</body>
+</html>

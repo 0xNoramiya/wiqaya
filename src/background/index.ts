@@ -1,9 +1,21 @@
 import { startTracking, applyGracePeriod, dismissOverlay, getDomainFromUrl } from './tracker'
 import { fetchRandomVerse } from './api'
-import { startLogin, isLoggedIn, addBookmark, getBookmarks, deleteBookmark, logReadingSession, logActivityDay, getStreaks, logout } from './auth'
+import { startLogin, completeLogin, isLoggedIn, addBookmark, getBookmarks, deleteBookmark, logReadingSession, logActivityDay, getStreaks, logout } from './auth'
 import { getStorage, setStorage } from '../shared/storage'
 
 startTracking()
+
+// External messages: only the OAuth callback page on GitHub Pages can reach
+// us here (gated by `externally_connectable.matches` in manifest.json).
+chrome.runtime.onMessageExternal.addListener((message, _sender, sendResponse) => {
+  if (message?.type === 'AUTH_CALLBACK') {
+    completeLogin(message.code, message.state).then((result) => {
+      sendResponse(result)
+    })
+    return true
+  }
+  return false
+})
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'GET_VERSE') {

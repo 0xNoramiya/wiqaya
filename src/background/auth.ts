@@ -1,256 +1,282 @@
-import { AUTH_URL, AUTH_TOKEN_URL, USER_API, AUTH_CLIENT_ID, AUTH_CLIENT_SECRET } from '../shared/constants'
+import {
+  AUTH_URL,
+  AUTH_TOKEN_URL,
+  AUTH_CLIENT_ID,
+  AUTH_CLIENT_SECRET,
+  USER_API,
+} from '../shared/constants'
 import { getStorage, setStorage } from '../shared/storage'
 import type { Bookmark } from '../shared/types'
 
-const MUSHAF_ID = 1
+const REDIRECT_URI = 'https://0xnoramiya.github.io/wiqaya/callback.html'
+const SCOPE = 'openid offline_access user'
+
+// --- PKCE helpers ---
+
+function base64UrlEncode(buf: ArrayBuffer | Uint8Array): string {
+  const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf)
+  let bin = ''
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i])
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+function randomBytes(len: number): Uint8Array {
+  const buf = new Uint8Array(len)
+  crypto.getRandomValues(buf)
+  return buf
+}
 
 function generateCodeVerifier(): string {
-  const array = new Uint8Array(32)
-  crypto.getRandomValues(array)
-  return Array.from(array, b => b.toString(16).padStart(2, '0')).join('')
+  return base64UrlEncode(randomBytes(32))
 }
 
 async function generateCodeChallenge(verifier: string): Promise<string> {
-  const encoder = new TextEncoder()
-  const data = encoder.encode(verifier)
-  const digest = await crypto.subtle.digest('SHA-256', data)
-  return btoa(String.fromCharCode(...new Uint8Array(digest)))
-    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))
+  return base64UrlEncode(hash)
 }
 
-function generateState(): string {
-  return crypto.randomUUID()
+// --- Pending-auth state (lives in session storage so it's cleared on browser close) ---
+
+interface PendingAuth {
+  state: string
+  verifier: string
 }
 
-
-export async function startLogin(): Promise<boolean> {
-  const verifier = generateCodeVerifier()
-  const challenge = await generateCodeChallenge(verifier)
-  const state = generateState()
-
-  const redirectUrl = 'https://0xnoramiya.github.io/wiqaya/docs/callback.html'
-
-  const params = new URLSearchParams({
-    response_type: 'code',
-    client_id: AUTH_CLIENT_ID,
-    redirect_uri: redirectUrl,
-    scope: 'openid offline_access user collection',
-    code_challenge: challenge,
-    code_challenge_method: 'S256',
-    state,
-  })
-
-  const authorizeUrl = `${AUTH_URL}?${params.toString()}`
-
-  try {
-    const responseUrl = await chrome.identity.launchWebAuthFlow({
-      url: authorizeUrl,
-      interactive: true,
-    })
-
-    if (!responseUrl) return false
-
-    const url = new URL(responseUrl)
-    const code = url.searchParams.get('code')
-    const returnedState = url.searchParams.get('state')
-
-    if (!code || returnedState !== state) return false
-
-    // Exchange code for tokens
-    const body = new URLSearchParams({
-      grant_type: 'authorization_code',
-      code,
-      redirect_uri: redirectUrl,
-      code_verifier: verifier,
-      client_id: AUTH_CLIENT_ID,
-    })
-
-    const response = await fetch(AUTH_TOKEN_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Basic ${btoa(AUTH_CLIENT_ID + ':' + AUTH_CLIENT_SECRET)}`,
-      },
-      body: body.toString(),
-    })
-
-    if (!response.ok) return false
-
-    const data = await response.json()
-    await setStorage({
-      accessToken: data.access_token,
-      refreshToken: data.refresh_token,
-      tokenExpiresAt: Date.now() + data.expires_in * 1000,
-    })
-
-    return true
-  } catch (err) {
-    console.error('Login failed:', err)
-    return false
+async function setPendingAuth(p: PendingAuth | null): Promise<void> {
+  if (p === null) {
+    await chrome.storage.session.remove('pendingAuth')
+  } else {
+    await chrome.storage.session.set({ pendingAuth: p })
   }
 }
 
+async function getPendingAuth(): Promise<PendingAuth | null> {
+  const r = await chrome.storage.session.get('pendingAuth')
+  return (r.pendingAuth as PendingAuth | undefined) ?? null
+}
 
-export async function getValidAccessToken(): Promise<string | null> {
+// --- Login flow ---
+
+export async function startLogin(): Promise<boolean> {
+  if (!AUTH_CLIENT_ID) {
+    console.error('[Wiqaya] VITE_QF_AUTH_CLIENT_ID is not set; cannot start login.')
+    return false
+  }
+
+  const verifier = generateCodeVerifier()
+  const challenge = await generateCodeChallenge(verifier)
+  const state = base64UrlEncode(randomBytes(16))
+
+  await setPendingAuth({ state, verifier })
+
+  const params = new URLSearchParams({
+    client_id: AUTH_CLIENT_ID,
+    response_type: 'code',
+    redirect_uri: REDIRECT_URI,
+    scope: SCOPE,
+    state,
+    code_challenge: challenge,
+    code_challenge_method: 'S256',
+  })
+
+  await chrome.tabs.create({ url: `${AUTH_URL}?${params.toString()}` })
+  return true
+}
+
+export async function completeLogin(
+  code: string,
+  state: string
+): Promise<{ success: boolean; error?: string }> {
+  const pending = await getPendingAuth()
+  if (!pending) return { success: false, error: 'No pending login in this browser session.' }
+  if (pending.state !== state) {
+    await setPendingAuth(null)
+    return { success: false, error: 'OAuth state mismatch — possible CSRF.' }
+  }
+
+  const body = new URLSearchParams({
+    grant_type: 'authorization_code',
+    code,
+    redirect_uri: REDIRECT_URI,
+    client_id: AUTH_CLIENT_ID,
+    code_verifier: pending.verifier,
+  })
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  }
+  if (AUTH_CLIENT_SECRET) {
+    headers.Authorization = `Basic ${btoa(`${AUTH_CLIENT_ID}:${AUTH_CLIENT_SECRET}`)}`
+  }
+
+  let response: Response
+  try {
+    response = await fetch(AUTH_TOKEN_URL, { method: 'POST', headers, body })
+  } catch (e) {
+    return { success: false, error: `Network error during token exchange: ${String(e)}` }
+  }
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => '')
+    return { success: false, error: `Token exchange failed (${response.status}): ${text}` }
+  }
+
+  const data = await response.json()
+  await setStorage({
+    accessToken: data.access_token,
+    refreshToken: data.refresh_token ?? null,
+    tokenExpiresAt: Date.now() + (data.expires_in ?? 3600) * 1000,
+  })
+  await setPendingAuth(null)
+  return { success: true }
+}
+
+// --- Token refresh ---
+
+async function getAccessToken(): Promise<string | null> {
   const { accessToken, refreshToken, tokenExpiresAt } = await getStorage([
     'accessToken',
     'refreshToken',
     'tokenExpiresAt',
   ])
 
-  if (!accessToken) return null
-
-  if (tokenExpiresAt && Date.now() < tokenExpiresAt - 60000) {
-    return accessToken
-  }
+  // Refresh ~30s before expiry so we don't race the clock.
+  const fresh = accessToken && tokenExpiresAt && Date.now() < tokenExpiresAt - 30_000
+  if (fresh) return accessToken
 
   if (!refreshToken) {
+    if (accessToken) await setStorage({ accessToken: null, tokenExpiresAt: null })
+    return null
+  }
+
+  const body = new URLSearchParams({
+    grant_type: 'refresh_token',
+    refresh_token: refreshToken,
+    client_id: AUTH_CLIENT_ID,
+  })
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  }
+  if (AUTH_CLIENT_SECRET) {
+    headers.Authorization = `Basic ${btoa(`${AUTH_CLIENT_ID}:${AUTH_CLIENT_SECRET}`)}`
+  }
+
+  const response = await fetch(AUTH_TOKEN_URL, { method: 'POST', headers, body }).catch(() => null)
+  if (!response || !response.ok) {
     await setStorage({ accessToken: null, refreshToken: null, tokenExpiresAt: null })
     return null
   }
 
-  try {
-    const body = new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-    })
-
-    const response = await fetch(AUTH_TOKEN_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Basic ${btoa(AUTH_CLIENT_ID + ':' + AUTH_CLIENT_SECRET)}`,
-      },
-      body: body.toString(),
-    })
-
-    if (!response.ok) {
-      await setStorage({ accessToken: null, refreshToken: null, tokenExpiresAt: null })
-      return null
-    }
-
-    const data = await response.json()
-    const { access_token, refresh_token, expires_in } = data
-
-    await setStorage({
-      accessToken: access_token,
-      refreshToken: refresh_token,
-      tokenExpiresAt: Date.now() + expires_in * 1000,
-    })
-
-    return access_token
-  } catch {
-    await setStorage({ accessToken: null, refreshToken: null, tokenExpiresAt: null })
-    return null
-  }
+  const data = await response.json()
+  await setStorage({
+    accessToken: data.access_token,
+    refreshToken: data.refresh_token ?? refreshToken,
+    tokenExpiresAt: Date.now() + (data.expires_in ?? 3600) * 1000,
+  })
+  return data.access_token
 }
 
+// --- Auth state ---
 
-async function getAuthHeaders(): Promise<Record<string, string> | null> {
-  const accessToken = await getValidAccessToken()
-  if (!accessToken) return null
-  return {
-    'x-auth-token': accessToken,
-    'x-client-id': AUTH_CLIENT_ID,
-    'Content-Type': 'application/json',
-  }
+export async function isLoggedIn(): Promise<boolean> {
+  const { accessToken, refreshToken } = await getStorage(['accessToken', 'refreshToken'])
+  return !!(accessToken || refreshToken)
 }
 
+export async function logout(): Promise<void> {
+  await setStorage({
+    accessToken: null,
+    refreshToken: null,
+    tokenExpiresAt: null,
+  })
+  await setPendingAuth(null)
+}
+
+// --- User API fetch wrapper ---
+
+async function userFetch(path: string, init: RequestInit = {}): Promise<Response | null> {
+  const token = await getAccessToken()
+  if (!token) return null
+
+  const headers = new Headers(init.headers)
+  headers.set('Authorization', `Bearer ${token}`)
+  if (AUTH_CLIENT_ID && !headers.has('x-client-id')) {
+    headers.set('x-client-id', AUTH_CLIENT_ID)
+  }
+  if (init.body && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json')
+  }
+
+  return fetch(`${USER_API}${path}`, { ...init, headers })
+}
+
+// --- Bookmarks ---
 
 export async function addBookmark(chapterNumber: number, verseNumber: number): Promise<boolean> {
-  const headers = await getAuthHeaders()
-  if (!headers) return false
-
-  try {
-    const response = await fetch(`${USER_API}/bookmarks`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ key: chapterNumber, type: 'ayah', verseNumber, mushaf: MUSHAF_ID }),
-    })
-    return response.ok
-  } catch {
-    return false
-  }
+  const response = await userFetch('/bookmarks', {
+    method: 'POST',
+    body: JSON.stringify({
+      type: 'ayah',
+      key: chapterNumber,
+      verse_number: verseNumber,
+    }),
+  })
+  return !!(response && response.ok)
 }
 
 export async function getBookmarks(): Promise<Bookmark[]> {
-  const headers = await getAuthHeaders()
-  if (!headers) return []
+  const response = await userFetch('/bookmarks', { method: 'GET' })
+  if (!response || !response.ok) return []
+  const data = await response.json().catch(() => null)
+  if (!data) return []
 
-  try {
-    const response = await fetch(`${USER_API}/bookmarks?mushafId=${MUSHAF_ID}&type=ayah&first=20`, {
-      headers,
-    })
-    if (!response.ok) return []
-    const data = await response.json()
-    return data.data ?? []
-  } catch {
-    return []
-  }
+  const list = Array.isArray(data) ? data : (data.bookmarks ?? data.data ?? [])
+  return list.map((b: any) => ({
+    id: String(b.id ?? b._id ?? `${b.type}-${b.key}-${b.verse_number ?? ''}`),
+    createdAt: b.created_at ?? b.createdAt ?? new Date().toISOString(),
+    type: b.type ?? 'ayah',
+    key: Number(b.key),
+    verseNumber: b.verse_number ?? b.verseNumber,
+  }))
 }
 
 export async function deleteBookmark(id: string): Promise<boolean> {
-  const headers = await getAuthHeaders()
-  if (!headers) return false
-
-  try {
-    const response = await fetch(`${USER_API}/bookmarks/${id}`, {
-      method: 'DELETE',
-      headers,
-    })
-    return response.ok
-  } catch {
-    return false
-  }
+  const response = await userFetch(`/bookmarks/${encodeURIComponent(id)}`, { method: 'DELETE' })
+  return !!(response && response.ok)
 }
 
+// --- Reading sessions / activity / streaks ---
 
 export async function logReadingSession(chapterNumber: number, verseNumber: number): Promise<void> {
-  const headers = await getAuthHeaders()
-  if (!headers) return
-
-  await fetch(`${USER_API}/reading-sessions`, {
+  await userFetch('/reading-sessions', {
     method: 'POST',
-    headers,
-    body: JSON.stringify({ chapterNumber, verseNumber }),
+    body: JSON.stringify({
+      chapter_number: chapterNumber,
+      verse_number: verseNumber,
+      verse_key: `${chapterNumber}:${verseNumber}`,
+    }),
   })
 }
 
 export async function logActivityDay(verseKey: string, seconds: number): Promise<void> {
-  const headers = await getAuthHeaders()
-  if (!headers) return
-
-  await fetch(`${USER_API}/activity-days`, {
+  await userFetch('/activity-days', {
     method: 'POST',
-    headers,
-    body: JSON.stringify({ type: 'QURAN', seconds, ranges: [verseKey], mushafId: MUSHAF_ID }),
+    body: JSON.stringify({
+      verse_key: verseKey,
+      seconds_engaged: seconds,
+      occurred_on: new Date().toISOString().slice(0, 10),
+    }),
   })
 }
 
-
 export async function getStreaks(): Promise<{ days: number; status: string } | null> {
-  const headers = await getAuthHeaders()
-  if (!headers) return null
+  const response = await userFetch('/streaks', { method: 'GET' })
+  if (!response || !response.ok) return null
+  const data = await response.json().catch(() => null)
+  if (!data) return null
 
-  try {
-    const response = await fetch(
-      `${USER_API}/streaks?type=QURAN&status=ACTIVE&first=1&sortOrder=desc&orderBy=startDate`,
-      { headers }
-    )
-    if (!response.ok) return null
-    const data = await response.json()
-    return data.data?.[0] ?? null
-  } catch {
-    return null
+  const streak = data.streak ?? data.current_streak ?? data
+  return {
+    days: Number(streak.days ?? streak.length ?? 0),
+    status: streak.status ?? streak.state ?? 'ACTIVE',
   }
-}
-
-
-export async function logout(): Promise<void> {
-  await setStorage({ accessToken: null, refreshToken: null, tokenExpiresAt: null })
-}
-
-export async function isLoggedIn(): Promise<boolean> {
-  const { accessToken } = await getStorage(['accessToken'])
-  return !!accessToken
 }

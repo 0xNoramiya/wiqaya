@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wiqaya — Privacy Policy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0a0e1a;
+      --card: #111827;
+      --gold: #D4AF37;
+      --teal: #14b8a6;
+      --white: #ffffff;
+      --slate: #94a3b8;
+      --slate-dark: #64748b;
+      --border: rgba(255,255,255,0.08);
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--white); line-height: 1.7; }
+    .container { max-width: 760px; margin: 0 auto; padding: 80px 24px 120px; }
+    .crumbs { font-size: 13px; color: var(--slate-dark); margin-bottom: 24px; }
+    .crumbs a { color: var(--gold); text-decoration: none; }
+    .crumbs a:hover { text-decoration: underline; }
+    h1 { font-size: 36px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em; }
+    .arabic { font-family: 'Amiri', serif; color: var(--gold); font-size: 28px; display: inline-block; margin-left: 12px; vertical-align: middle; }
+    .updated { color: var(--slate-dark); font-size: 13px; margin-bottom: 32px; }
+    h2 { font-size: 20px; font-weight: 600; margin-top: 36px; margin-bottom: 12px; color: var(--teal); letter-spacing: 0.01em; }
+    p, ul { color: var(--slate); margin-bottom: 12px; font-size: 15px; }
+    ul { padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    code { background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 4px; color: var(--teal); font-size: 13px; }
+    a { color: var(--gold); }
+    .note {
+      background: rgba(20,184,166,0.05);
+      border: 1px solid rgba(20,184,166,0.15);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 14px;
+      color: var(--slate);
+    }
+    footer { border-top: 1px solid var(--border); padding: 32px 0; text-align: center; color: var(--slate-dark); font-size: 13px; }
+    footer a { color: var(--gold); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p class="crumbs"><a href="./">← Wiqaya</a></p>
+    <h1>Privacy Policy <span class="arabic">وقاية</span></h1>
+    <p class="updated">Last updated: 2026-05-01</p>
+
+    <p>Wiqaya is a Chrome extension built for the Quran Foundation Hackathon 2026. This page explains what data the extension touches, where it lives, and what we do <em>not</em> do with it.</p>
+
+    <div class="note">
+      <strong>Short version:</strong> Wiqaya stores everything locally in your browser. The only servers it talks to are the Quran Foundation APIs (for verses, recitations, and — if you sign in — your bookmarks and reading streaks). There is no analytics, no advertising, and no third-party tracking.
+    </div>
+
+    <h2>1. Data Wiqaya stores locally</h2>
+    <p>The following is kept in <code>chrome.storage.local</code> on your device and never transmitted anywhere except as described below:</p>
+    <ul>
+      <li>The list of websites you've added to your watch list and their per-site time limits.</li>
+      <li>How long you've spent on each tracked site today (resets daily at local midnight).</li>
+      <li>Your settings: theme, translation, reciter, global time limit, audio auto-play.</li>
+      <li>Local counts of verses you've read today and total verses read.</li>
+      <li>If you sign in: an OAuth access token, refresh token, and their expiry timestamps.</li>
+      <li>A cached list of Quran chapters (downloaded once from the Content API).</li>
+    </ul>
+
+    <h2>2. Network requests Wiqaya makes</h2>
+    <p>The extension makes outbound requests <strong>only</strong> to the following hosts, and only as a direct consequence of using the extension:</p>
+    <ul>
+      <li><code>apis.quran.foundation</code> — to fetch a random verse, its translation, and recitation metadata.</li>
+      <li><code>oauth2.quran.foundation</code> — to obtain an access token for the Content API (client-credentials grant, no user data involved).</li>
+      <li><code>apis-prelive.quran.foundation</code> and <code>prelive-oauth2.quran.foundation</code> — only if you sign in, to handle OAuth and User-API calls (bookmarks, streaks, reading sessions).</li>
+      <li><code>audio.qurancdn.com</code> and <code>verses.quran.com</code> — to stream the audio recitation file for the verse currently shown.</li>
+    </ul>
+    <p>Wiqaya does <strong>not</strong> contact any other server, and it does not send the URLs or content of the websites you browse to anyone — your browsing list stays on your device.</p>
+
+    <h2>3. What Wiqaya does not collect</h2>
+    <ul>
+      <li>No analytics or telemetry of any kind.</li>
+      <li>No advertising identifiers, fingerprinting, or third-party trackers.</li>
+      <li>No collection of the content of pages you visit.</li>
+      <li>No personal information beyond what you voluntarily share with the Quran Foundation by signing in.</li>
+    </ul>
+
+    <h2>4. Sign-in and the Quran Foundation User API</h2>
+    <p>Sign-in is optional. If you choose to sign in, Wiqaya uses the OAuth 2.0 Authorization Code flow with PKCE, redirecting you to the Quran Foundation's authorization server. After you approve, the access and refresh tokens are stored locally on your device. They are sent only to the Quran Foundation's API endpoints, only when you take an action that requires them (such as bookmarking a verse or recording a reading session).</p>
+    <p>The Quran Foundation has its own privacy policy that governs what they store on their servers. Please refer to <a href="https://quran.foundation" target="_blank">quran.foundation</a> for those terms.</p>
+
+    <h2>5. Permissions the extension requests</h2>
+    <ul>
+      <li><code>activeTab</code>, <code>tabs</code> — to detect which site is currently in the foreground for time tracking.</li>
+      <li><code>storage</code> — to persist your settings and tracked-site data locally.</li>
+      <li><code>idle</code> — to pause tracking when your computer is idle or locked.</li>
+      <li><code>alarms</code> — to run the time-tracking tick on a periodic schedule.</li>
+      <li><code>identity</code> — used by the OAuth flow when you sign in.</li>
+      <li><code>&lt;all_urls&gt;</code> content script — required to inject the verse overlay onto the site you're currently using when the time limit is reached. The content script does not read or transmit page content.</li>
+    </ul>
+
+    <h2>6. Removing your data</h2>
+    <p>To delete all local data, remove the extension from <code>chrome://extensions</code> — Chrome will clear its local storage. To revoke server-side access, sign out from within Wiqaya's settings, or revoke the application from your Quran Foundation account.</p>
+
+    <h2>7. Changes to this policy</h2>
+    <p>This is a hackathon project and the extension is under active development. If this policy changes, the updated date at the top of this page will reflect that.</p>
+
+    <h2>8. Contact</h2>
+    <p>For questions, open an issue at <a href="https://github.com/0xNoramiya/wiqaya" target="_blank">github.com/0xNoramiya/wiqaya</a>.</p>
+  </div>
+
+  <footer>
+    <p style="font-family:'Amiri',serif; font-size:20px; color:var(--gold); margin-bottom:6px;">وقاية</p>
+    <p>Built for the <a href="https://quran.foundation" target="_blank">Quran Foundation</a> Hackathon 2026 · <a href="./terms.html">Terms</a> · <a href="./">Home</a></p>
+  </footer>
+</body>
+</html>

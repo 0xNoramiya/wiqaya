@@ -3,6 +3,7 @@
   "name": "Wiqaya — وقاية",
   "version": "1.0.0",
   "description": "Your screen time, redeemed. A Quran verse gate for mindful browsing.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA47SR8QFrnZUKs4jvvUk5m4Jg1ysKnPIP2EaK+W8tvP3Ngl6jStoGQlWTyz0XJMFwk1F/Rw4Tu+O7hnNIir8SCxWbMQK313yKl/0GE0zvrhwzxd3w9ZuibpiuFGHe4iGsskLJ0HchygdUhz9vVJs0YIR+q/z2qAh+s1BwxhQVZ2Qgo3GYAlJiHBTmTcD6MV/sZsvLLCjHJImvWP5CVztvGdSjFkhwmUqXq0lhiBY9wfixhNE45UmH2YaBLOzYV+tMeZark1oppWBpyxDjdq9myJ6GJVQHnsdtBxU2EB16kHofCBZHGyOZ2gj8+T3Jy448vd55aRp4/nU8c/JTPtGwYQIDAQAB",
   "permissions": ["activeTab", "tabs", "storage", "idle", "alarms", "identity"],
   "host_permissions": [
     "https://apis.quran.foundation/*",
